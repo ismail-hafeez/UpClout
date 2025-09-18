@@ -1,0 +1,4 @@
+apify-client
+ipykernel
+dotenv
+pandas
