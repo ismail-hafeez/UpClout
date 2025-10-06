@@ -2,32 +2,22 @@ import psycopg2
 import pandas as pd
 
 conn = psycopg2.connect(database="postgres", user="postgres", password=1040)
-
 cur = conn.cursor()
 
-cur.execute(
+def insert_influencer_data(first_name: str, last_name: str, gender: str, department: str, position: str, salary: float) -> str:
+
+    insert_query = """
+        INSERT INTO employee (firstname, lastname, gender, department, Position, Salary)
+        VALUES (%s, %s, %s, %s, %s, %s)
     """
-    select EmployeeID, FirstName, Gender, department, position, salary
-    from employee
-    where salary > (
-        select avg(salary)
-        from employee
-    )
-    """
-)
 
-columns = [
-    "EmployeeID", "FirstName", "Gender",
-    "Department", "Position", "Salary"
-]
+    cur.execute(insert_query, (first_name, last_name, gender, department, position, salary))
 
-tup = cur.fetchall()
+    conn.commit()
 
-df = pd.DataFrame(tup, columns=columns)
-print(df)
+    cur.close()
+    conn.close()
+
+    return "Data inserted successfully!"
 
 
-#conn.commit()
-
-cur.close()
-conn.close()

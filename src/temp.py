@@ -1,13 +1,13 @@
 import pandas as pd
 from datetime import datetime
-from apify import apify_actor
+from apify_class import Apify
 import time
 
 DATA_PATH = "../data"
 
 df=pd.read_csv(f"{DATA_PATH}/pakistan_influencers_sample.csv")
 
-def scrape():
+def scrape(apify: Apify) -> None:
     size=len(df)
     
     for idx in range(5):
@@ -18,16 +18,29 @@ def scrape():
         if insta == "nan":
             continue
 
-        message=apify_actor(insta)
+        result=apify.scrape_meta_data(instaProfile)
+        print(result)
+        result_2=apify.scrape_post_data(instaProfile)
+        print(result_2)
 
-        with open("log.log", "a") as file:
+        with open("logFile.log", "a") as file:
             timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-            file.write(f"[{timestamp}] {message}\n")
+            file.write(f"[{timestamp}]-{result}-{result_2}\n")
 
         time.sleep(1)
 
 if __name__=="__main__":
 
-    scrape()
+    instaProfile = "uzma.k.ali"
+
+    apify=Apify()
+
+    #scrape(apify)
+
+    result=apify.scrape_meta_data(instaProfile)
+    print(result)
+    result_2=apify.scrape_post_data(instaProfile)
+    print(result_2)
+
 
     
