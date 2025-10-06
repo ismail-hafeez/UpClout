@@ -3,3 +3,4 @@ ipykernel
 dotenv
 pandas
 psycopg2
+requests
