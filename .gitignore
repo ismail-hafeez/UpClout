@@ -2,3 +2,6 @@ venv
 .env
 data/
 __pycache__
+temp_data
+src/log.log
+src/apify.py
