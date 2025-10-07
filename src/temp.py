@@ -5,8 +5,6 @@ import time
 
 DATA_PATH = "../data"
 
-df=pd.read_csv(f"{DATA_PATH}/pakistan_influencers_sample.csv")
-
 def scrape(apify: Apify) -> None:
     size=len(df)
     
@@ -31,7 +29,7 @@ def scrape(apify: Apify) -> None:
 
 if __name__=="__main__":
 
-    instaProfile = "uzma.k.ali"
+    instaProfile = "humzaamin"
 
     apify=Apify()
 

@@ -4,3 +4,7 @@ dotenv
 pandas
 psycopg2
 requests
+beautifulsoup4
+requests_html
+lxml_html_clean 
+selenium
