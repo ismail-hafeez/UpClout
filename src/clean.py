@@ -147,6 +147,16 @@ def clean_meta_data(current_folder: str) -> None:
     
     write_to_log_file(f"{csv_file} Cleaned Successfully")
 
-def clean_post_data(current_folder: str) -> None:
-    ...
+def clean_post_data(current_folder: str): # -> Generator
+    json_file = None
+    for file in os.listdir(current_folder):
+        if file.endswith(".json"):
+            json_file = os.path.join(current_folder, file)
+            break
+
+    with open(json_file, "r", encoding="utf-8") as file:
+        data=json.load(file)
+   
+    for _dict in data:
+        yield _dict
 

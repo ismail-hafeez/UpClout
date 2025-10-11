@@ -109,3 +109,24 @@ class Postgres:
         finally:
             self.write_to_log_file(response)
 
+    def load_hashtags_table(self, hashtag: str) -> None:
+        response: str
+        try:
+            query = """
+                INSERT INTO Hashtags (tag_name)
+                VALUES (%s)
+                ON CONFLICT (tag_name) DO NOTHING;
+            """
+
+            self.cur.execute(query, (hashtag,))
+            self.conn.commit()
+
+            response = f"{hashtag} Successfully Inserted in Hashtags Table"
+        except Exception as e:
+            response = f"{hashtag} Insertion in Hashtags Table enountered error: {e}"
+
+        finally:
+            self.write_to_log_file(response)
+
+    def load_posts_hashtags_table(self, hashtag: str) -> None:
+        ...

@@ -102,7 +102,7 @@ def hashtags_table(cur, conn) -> None:
     try:
         query = """
             CREATE TABLE IF NOT EXISTS Hashtags (
-                hashtagID INT PRIMARY KEY,
+                hashtagID INT SERIAL PRIMARY KEY,
                 tag_name VARCHAR(255)
             );
         """
