@@ -3,5 +3,5 @@ venv
 data/
 __pycache__
 temp_data
-src/log.log
+logs
 src/apify.py
