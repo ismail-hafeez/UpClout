@@ -35,9 +35,9 @@ def ETL():
         postgres.load_influencer_table(path) # Load
         break
         # Switch APIs every 5 scrapes
-        """if idx % 5 == 0:
+        if idx % 5 == 0:
             apify.rotate_apis()
-            time.sleep(5)"""
+            time.sleep(5)
         
     
     postgres.close_connection()
@@ -45,5 +45,10 @@ def ETL():
 if __name__=="__main__":
 
     #ETL()
-    #clean.clean_meta_data(path)
-    ...
+    start = time.time()      
+
+    clean.clean_post_data("../data/mahirahkhan")
+
+    end = time.time()        
+    print(f"Execution time: {end - start:.4f} seconds")
+    

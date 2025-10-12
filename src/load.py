@@ -128,5 +128,107 @@ class Postgres:
         finally:
             self.write_to_log_file(response)
 
-    def load_posts_hashtags_table(self, hashtag: str) -> None:
-        ...
+    def load_posts_hashtags_table(self, postID_hashID: tuple) -> None:
+        response: str
+        try:
+            query = """
+                INSERT INTO posts_hashtags (post_id, hashtag_id)
+                VALUES (%s, %s)
+                ON CONFLICT DO NOTHING;
+            """
+            self.cur.executemany(query, postID_hashID)
+            self.conn.commit()
+
+            response = "Successfully Inserted in Hashtags and Posts Table"
+        except Exception as e:
+            response = f"Hashtags and Posts Table Insertion enountered error: {e}"
+
+        finally:
+            self.write_to_log_file(response)
+
+    def load_posts_table(self, _dict: dict) -> None:
+        try:
+            query = """
+                INSERT INTO Posts (
+                    postID,
+                    type,
+                    caption,
+                    url,
+                    commentsCount,
+                    likesCount,
+                    timestamp,
+                    isSponsored
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (postID) DO NOTHING;
+            """
+
+            values = (
+                _dict.get("id"),
+                _dict.get("type"),
+                _dict.get("caption"),
+                _dict.get("url"),
+                _dict.get("commentsCount"),
+                _dict.get("likesCount"),
+                _dict.get("timestamp"),
+                _dict.get("isSponsored"),
+            )
+
+            self.cur.execute(query, values)
+            self.conn.commit()
+
+            response = f"{_dict.get('id')} Post Inserted Successfully in Post Table"
+
+        except Exception as e:
+            response = f"{_dict.get('id')} Post Insertion in Post Table encountered error: {e}"
+
+        finally:
+            self.write_to_log_file(response)
+
+    def load_taggedUsers(self, id: int, username: str) -> None:
+        try:
+            query = """
+                INSERT INTO taggeduser (
+                    taggeduserID,
+                    username
+                )
+                VALUES (%s, %s)
+                ON CONFLICT (taggeduserID) DO NOTHING;
+            """
+
+            values = (id, username)
+
+            self.cur.execute(query, values)
+            self.conn.commit()
+
+            response = f"{username} Inserted Successfully in TaggedUser Table"
+
+        except Exception as e:
+            response = f"{username} Insertion in TaggedUser Table encountered error: {e}"
+
+        finally:
+            self.write_to_log_file(response)
+
+    def load_posts_taggedUsers(self, postid: int, taggedUserid: int) -> None:
+        try:
+            query = """
+                INSERT INTO posts_taggeduser (
+                    postID,
+                    taggeduserID
+                )
+                VALUES (%s, %s)
+            """
+
+            values = (postid, taggedUserid)
+
+            self.cur.execute(query, values)
+            self.conn.commit()
+
+            response = "Successfully Inserted Successfully in Posts_TaggedUser Table"
+
+        except Exception as e:
+            response = f"Insertion in Posts_TaggedUser Table encountered error: {e}"
+
+        finally:
+            self.write_to_log_file(response)
+

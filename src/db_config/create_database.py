@@ -103,7 +103,7 @@ def hashtags_table(cur, conn) -> None:
         query = """
             CREATE TABLE IF NOT EXISTS Hashtags (
                 hashtagID INT SERIAL PRIMARY KEY,
-                tag_name VARCHAR(255)
+                tag_name VARCHAR(255) UNIQUE
             );
         """
 
@@ -123,7 +123,7 @@ def posts_table(cur, conn) -> None:
     try:
         query = """
             CREATE TABLE IF NOT EXISTS posts (
-            postID INT PRIMARY KEY,
+            postID BIGINT PRIMARY KEY,
             caption TEXT,
             type VARCHAR(255),
             url VARCHAR(255),
@@ -131,6 +131,8 @@ def posts_table(cur, conn) -> None:
             comment_count INT,
             is_collaboration BOOLEAN,
             created_at TIMESTAMP
+            ownerID BIGINT,
+            FOREIGN KEY (ownerID) REFERENCES influencer(influencerID)
         );
         """
 
@@ -150,7 +152,7 @@ def posts_hashtags_table(cur, conn) -> None:
     try:
         query = """
             CREATE TABLE posts_hashtags (
-            post_id INT REFERENCES posts(postID),
+            post_id BIGINT REFERENCES posts(postID),
             hashtag_id INT REFERENCES hashtags(hashtagid),
             PRIMARY KEY (post_id, hashtag_id)
         );
@@ -163,6 +165,49 @@ def posts_hashtags_table(cur, conn) -> None:
 
     except Exception as e:
         response=f"Posts-Hashtags Table enountered error: {e}"
+
+    finally:
+        write_to_log_file(response)
+
+def taggedUser_table(cur, conn) -> None:
+    response: str
+    try:
+        query = """
+            CREATE TABLE IF NOT EXISTS TaggedUser (
+            TaggedUserID INT PRIMARY KEY,
+            username VARCHAR(255)
+        );
+        """
+        cur.execute(query)
+        conn.commit()
+
+        response="TaggedUser Table created successfully"
+
+    except Exception as e:
+        response=f"TaggedUser Table enountered error: {e}"
+
+    finally:
+        write_to_log_file(response)
+
+def posts_taggedUser_table(cur, conn) -> None:
+    response: str
+    try:
+        query = """
+           CREATE TABLE IF NOT EXISTS Posts_TaggedUser (
+            postID BIGINT,
+            TaggedUserID INT,
+            PRIMARY KEY (postID, TaggedUserID),
+            FOREIGN KEY (postID) REFERENCES posts(postID) ON DELETE CASCADE,
+            FOREIGN KEY (TaggedUserID) REFERENCES TaggedUser(TaggedUserID) ON DELETE CASCADE
+        );
+        """
+        cur.execute(query)
+        conn.commit()
+
+        response="Posts_TaggedUser Table created successfully"
+
+    except Exception as e:
+        response=f"Posts_TaggedUser Table enountered error: {e}"
 
     finally:
         write_to_log_file(response)
@@ -183,6 +228,8 @@ def create_db() -> str:
         posts_table(cur, conn)
         hashtags_table(cur, conn)
         posts_hashtags_table(cur, conn)
+        taggedUser_table(cur, conn)
+        posts_taggedUser_table(cur, conn)
         # ... add more tables here
 
         conn.commit()
