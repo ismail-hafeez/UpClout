@@ -95,7 +95,7 @@ def extract_location(df: pd.DataFrame) -> pd.DataFrame:
     }
 
     location = "Nan"
-    bio = df["biography"][0]
+    bio = df["biography"][0].lower()
 
     # Check for any key from city_map in bio_clean
     for key, city in possible_locations.items():

@@ -43,11 +43,12 @@ def ETL():
     postgres.close_connection()
 
 if __name__=="__main__":
-
+    postgres = Postgres()
     #ETL()
     start = time.time()      
-
-    clean.clean_post_data("../data/mahirahkhan")
+   # clean.clean_meta_data("../data/mubsher.bhatti")
+    postgres.load_influencer_table("../data/mubsher.bhatti")
+    #clean.clean_post_data("../data/mahirahkhan")
 
     end = time.time()        
     print(f"Execution time: {end - start:.4f} seconds")
