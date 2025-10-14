@@ -10,6 +10,10 @@ importlib.reload(load)
 from load import Postgres
 import psycopg2
 
+import apify_class
+importlib.reload(apify_class)
+from apify_class import Apify
+
 """
 This script only cleans data 
 EXCEPT
@@ -245,8 +249,65 @@ def handle_hashtags(postID: int, hashtags: list) -> None:
 
     postgres.close_connection()
 
-def handle_mentions(postID: int, mentions: list) -> None:
+def mention_exists(username: str) -> bool:
+    conn = psycopg2.connect(database="postgres", user="postgres", password=1040)
+    cur = conn.cursor()
+
+    query = """
+        SELECT EXISTS (
+            SELECT 1
+            FROM influencers
+            WHERE username = %s
+        );
+    """
+    cur = conn.cursor()
+    cur.execute(query, (username,))
+    result = cur.fetchone()[0]
+    cur.close()
+    
+    return result
+
+def above_follower_threshold(username: str) -> bool:
+    threshold: int = 1000
+    # Scrape Meta Data
+    apify = Apify()
+    apify.scrape_meta_data(username)
+
+    # If followers < 1000 -> DISCARD
+    folder_path = f"../data/{username}"
+    df = pd.read_csv(f"{folder_path}/{username}_meta_data.csv")
+    
+    followers = int(df['followersCount'][0])
+    if followers >= threshold:
+        return 1
+    else:
+        # delete folder
+        if os.path.exists(folder_path):
+            shutil.rmtree(folder_path)
+            return 0
+
+def is_influencer(usernanme: str) -> bool:
     ...
+
+def handle_mentions(postID: int, mentions: list) -> None:
+    if not mentions:
+        return
+    
+    for username in mentions:
+        if mention_exists(username):
+            pass
+        if not above_follower_threshold(username):
+            continue
+        if is_influencer(username):
+            # Add to mentions table
+            # Add to posts_mentions
+            # Add to insta_profiles.txt
+            ...
+        else: 
+            # Is brand
+            # do something else
+            ...        
+        ...
 
 def handle_taggedUsers(postID: int, taggedUsers: list) -> None:
     

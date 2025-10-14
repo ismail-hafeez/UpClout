@@ -212,6 +212,26 @@ def posts_taggedUser_table(cur, conn) -> None:
     finally:
         write_to_log_file(response)
 
+def mentions_table(cur, conn) -> None:
+    response: str
+    try:
+        query = """
+            CREATE TABLE IF NOT EXISTS Mentions (
+            MentionID INT PRIMARY KEY,
+            username VARCHAR(255)
+        );
+        """
+        cur.execute(query)
+        conn.commit()
+
+        response="Mentions Table created successfully"
+
+    except Exception as e:
+        response=f"Mentions Table enountered error: {e}"
+
+    finally:
+        write_to_log_file(response)
+
 def create_db() -> str:
 
     try:
