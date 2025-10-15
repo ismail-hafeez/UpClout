@@ -337,7 +337,7 @@ def clean_post_data(current_folder: str) -> None:
 
         # Loading posts
         postgres.load_posts_table(_dict)
-        handle_mentions(_dict['id'], _dict['mentions'])
+        #handle_mentions(_dict['id'], _dict['mentions'])
 
         if "taggedUsers" in _dict:
             handle_taggedUsers(_dict["id"], _dict["taggedUsers"])

@@ -30,8 +30,9 @@ def ETL():
     influencers = get_influencer_list()
     
     for idx, influencer in enumerate(influencers):
-        path = extract.scrape_influencer("sajalaly") # Extract
+        path = extract.scrape_influencer("thekubism") # Extract
         clean.clean_meta_data(path) # Transform
+        clean.clean_post_data(path)
         postgres.load_influencer_table(path) # Load
         break
         # Switch APIs every 5 scrapes
@@ -43,11 +44,12 @@ def ETL():
     postgres.close_connection()
 
 if __name__=="__main__":
-    postgres = Postgres()
-    #ETL()
+    #postgres = Postgres()
+    
     start = time.time()      
-   # clean.clean_meta_data("../data/mubsher.bhatti")
-    postgres.load_influencer_table("../data/mubsher.bhatti")
+    ETL()
+    #clean.clean_meta_data("../data/mubsher.bhatti")
+    #postgres.load_influencer_table("../data/mubsher.bhatti")
     #clean.clean_post_data("../data/mahirahkhan")
 
     end = time.time()        

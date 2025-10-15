@@ -11,7 +11,7 @@ def scrape_influencer(username: str) -> str:
 
     apify.scrape_meta_data(username)
     time.sleep(2)
-    #apify.scrape_post_data(username)
+    apify.scrape_post_data(username)
 
     return f"../data/{username}"
 
