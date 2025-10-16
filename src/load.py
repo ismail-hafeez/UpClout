@@ -146,7 +146,7 @@ class Postgres:
         finally:
             self.write_to_log_file(response)
 
-    def load_posts_table(self, _dict: dict) -> None:
+    def load_posts_table(self, _dict: dict, influencerID: int) -> None:
         try:
             query = """
                 INSERT INTO Posts (
@@ -157,9 +157,10 @@ class Postgres:
                     commentsCount,
                     likesCount,
                     timestamp,
-                    isSponsored
+                    isSponsored,
+                    ownerid
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (postID) DO NOTHING;
             """
 
@@ -172,6 +173,7 @@ class Postgres:
                 _dict.get("likesCount"),
                 _dict.get("timestamp"),
                 _dict.get("isSponsored"),
+                influencerID
             )
 
             self.cur.execute(query, values)

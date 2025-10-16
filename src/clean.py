@@ -70,8 +70,11 @@ def remove_spaces(text: str) -> str:
     return cleaned_text
 
 def clean_bio(df: pd.DataFrame) -> pd.DataFrame:
+    bio = df["biography"][0]
 
-    bio=df["biography"][0]
+    if not bio:
+        return
+
     # If bio, send to cleaners
     emojiless_bio = remove_emojis(bio)
     cleaned_bio = remove_spaces(emojiless_bio)
@@ -135,7 +138,7 @@ def correct_dtypes_meta(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-def clean_meta_data(current_folder: str) -> None:
+def clean_meta_data(current_folder: str) -> int:
     """
     look for CSV 
     read with pandas
@@ -161,6 +164,8 @@ def clean_meta_data(current_folder: str) -> None:
     df.to_csv(csv_file, index=False)
     
     write_to_log_file(f"{csv_file} Cleaned Successfully")
+
+    return df['id']
 
 def get_post_dict(current_folder: str) -> dict:
     json_file = None
@@ -326,7 +331,7 @@ def handle_taggedUsers(postID: int, taggedUsers: list) -> None:
 def handle_coauthors(postID: int, taggedUsers: list) -> None:
     ...
 
-def clean_post_data(current_folder: str) -> None:
+def clean_post_data(current_folder: str, influencerID: int) -> None:
     
     data = get_post_dict(current_folder)
     postgres = Postgres()
@@ -336,7 +341,7 @@ def clean_post_data(current_folder: str) -> None:
         _dict = correct_dtypes_post(_dict)
 
         # Loading posts
-        postgres.load_posts_table(_dict)
+        postgres.load_posts_table(_dict, influencerID)
         #handle_mentions(_dict['id'], _dict['mentions'])
 
         if "taggedUsers" in _dict:
