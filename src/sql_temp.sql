@@ -1,2 +1,2 @@
-SELECT *
-FROM posts;
+SELECT COUNT(*)
+FROM influencers;

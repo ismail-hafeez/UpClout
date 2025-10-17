@@ -165,9 +165,9 @@ def clean_meta_data(current_folder: str) -> int:
     
     write_to_log_file(f"{csv_file} Cleaned Successfully")
 
-    return df['id']
+    return int(df['id'][0])
 
-def get_post_dict(current_folder: str) -> dict:
+def get_post_dict(current_folder: str) ->list[dict]:
     json_file = None
     for file in os.listdir(current_folder):
         if file.endswith(".json"):
@@ -339,9 +339,10 @@ def clean_post_data(current_folder: str, influencerID: int) -> None:
     for _dict in data:
         _dict = keep_useful_keys(_dict)
         _dict = correct_dtypes_post(_dict)
+        _dict['ownerID_TEMP'] = int(influencerID)
 
         # Loading posts
-        postgres.load_posts_table(_dict, influencerID)
+        postgres.load_posts_table(_dict)
         #handle_mentions(_dict['id'], _dict['mentions'])
 
         if "taggedUsers" in _dict:

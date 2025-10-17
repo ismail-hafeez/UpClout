@@ -146,7 +146,7 @@ class Postgres:
         finally:
             self.write_to_log_file(response)
 
-    def load_posts_table(self, _dict: dict, influencerID: int) -> None:
+    def load_posts_table(self, _dict: dict) -> None:
         try:
             query = """
                 INSERT INTO Posts (
@@ -173,7 +173,7 @@ class Postgres:
                 _dict.get("likesCount"),
                 _dict.get("timestamp"),
                 _dict.get("isSponsored"),
-                influencerID
+                _dict.get("ownerID_TEMP")
             )
 
             self.cur.execute(query, values)

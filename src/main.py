@@ -35,14 +35,30 @@ def ETL():
     
     apify = Apify()
     postgres = Postgres()
-    influencers = get_influencer_list()
+    #influencers = get_influencer_list()
+    influencers = [
+        "mtpasha_",
+        "isaa_akhn",
+        "californiakistan",
+        "megpakistan",
+        "alifsay",
+        "mahnooraamirr",
+        "nylarajah",
+        "makeupbynoormir",
+        "factnamas",
+        "kashaff_alii",
+        "waniaaanadeem"
+    ]
     
     for idx, influencer in enumerate(influencers):
-        start = time.time()
-        path = extract.scrape_influencer(influencer) # Extract
-        end = time.time()
-        mssg: str = f"{influencer} EXTRACTION time: {end - start:.4f} seconds"
-        write_to_log_file(mssg)
+        #start = time.time()
+        #path = extract.scrape_influencer(influencer) # Extract
+        #end = time.time()
+        #mssg: str = f"{influencer} EXTRACTION time: {end - start:.4f} seconds"
+        #write_to_log_file(mssg)
+
+        path = f"../data/{influencer}"
+        print(f"Current Influencer: {influencer}")
 
         start = time.time()
         influencerID = clean.clean_meta_data(path) # Transform I

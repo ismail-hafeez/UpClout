@@ -8,3 +8,4 @@ beautifulsoup4
 requests_html
 lxml_html_clean 
 selenium
+joblib
