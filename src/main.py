@@ -1,4 +1,3 @@
-import pandas as pd
 from datetime import datetime
 import time
 
@@ -16,7 +15,7 @@ from apify_class import Apify
 
 DATA_PATH = "../data"
 
-def get_influencer_list() -> list:
+def get_influencer_list() -> list[str]:
 
     with open("../insta_profiles.txt", "r") as file:
         influencers = [line.strip() for line in file.readlines()]
@@ -35,20 +34,7 @@ def ETL():
     
     apify = Apify()
     postgres = Postgres()
-    #influencers = get_influencer_list()
-    influencers = [
-        "mtpasha_",
-        "isaa_akhn",
-        "californiakistan",
-        "megpakistan",
-        "alifsay",
-        "mahnooraamirr",
-        "nylarajah",
-        "makeupbynoormir",
-        "factnamas",
-        "kashaff_alii",
-        "waniaaanadeem"
-    ]
+    influencers = get_influencer_list()
     
     for idx, influencer in enumerate(influencers):
         #start = time.time()
@@ -83,7 +69,7 @@ def ETL():
             print("Rotating APIs")
             apify.rotate_apis()
             time.sleep(5)
-            print("Sleeping for 5 seconds ... ")
+            print("Sleeping for 5 seconds ... ")  
         if idx == 10:
             break
     
