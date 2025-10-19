@@ -1,9 +1,11 @@
 from apify_class import Apify
 import time
 
-def scrape_influencer(username: str, apify: Apify) -> str:
+def scrape_influencer(username: str, apify: Apify) -> int | str:
     
-    apify.scrape_meta_data(username)
+    res = apify.scrape_meta_data(username)
+    if res == 0:
+        return 0
     time.sleep(2)
     apify.scrape_post_data(username)
 

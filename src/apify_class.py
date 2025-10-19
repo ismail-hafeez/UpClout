@@ -4,6 +4,7 @@ import os, json
 import requests
 import pandas as pd
 from datetime import datetime
+import log
 
 """
 Defines scrapers to extract data
@@ -47,7 +48,7 @@ class Apify:
         else:
             log_message = f"Failed to download image. Status code:{response.status_code}"
 
-        self.write_to_log_file(log_message)
+        log.log_extract_meta_data(log_message)
     
     def save_to_csv(self, PATH: str, data: list) -> pd.DataFrame:
         # Convert to pandas DataFrame
@@ -105,9 +106,9 @@ class Apify:
         except Exception as e:
             log_message = f"Error scraping {instaprofile}'s post data: {e}"
         finally:
-            self.write_to_log_file(log_message)
+            log.log_extract_post_data(log_message)
         
-    def scrape_meta_data(self, instaprofile: str) -> None:
+    def scrape_meta_data(self, instaprofile: str) -> int | None:
 
         PATH=self.make_folder(instaprofile)
         run_input = {
@@ -121,6 +122,11 @@ class Apify:
         print("Running Instagram Scraper Actor...")
         try:
             data = self.run_actor(run_input)
+            # If Private Account
+            if data[0]['private'] == True:
+                log_message = "Skipping because Private"
+                return 0
+            
             df = self.save_to_csv(PATH, data)
             # Downloading Profile Picture
             self.download_profil_pic(PATH, df)
@@ -130,5 +136,5 @@ class Apify:
             log_message = f"Error scraping {instaprofile}'s meta data: {e}"
 
         finally:
-            self.write_to_log_file(log_message)
+            log.log_extract_meta_data(log_message)
         

@@ -1,2 +1,2 @@
-SELECT COUNT(*)
+SELECT *
 FROM influencers;

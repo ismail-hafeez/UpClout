@@ -156,10 +156,9 @@ def get_hashtagID(hashtags: list) -> list:
 
     return hashtag_ids
 
-def handle_hashtags(postID: int, hashtags: list) -> None:
+def handle_hashtags(postID: int, hashtags: list, postgres: Postgres) -> None:
     if not hashtags:
         return
-    postgres = Postgres()
     # Dump Hashtags in Hashtags table first
     for hashtag in hashtags:
         postgres.load_hashtags_table(hashtag)
@@ -170,8 +169,6 @@ def handle_hashtags(postID: int, hashtags: list) -> None:
     postID_hashID = [(postID, hashtag_id) for hashtag_id in hashtag_ids]    
     # Dumping in Hastags_Posts (N:M) table
     postgres.load_posts_hashtags_table(postID_hashID)
-
-    postgres.close_connection()
 
 def clean_post_data(current_folder: str, influencerID: int) -> None:
     
@@ -193,9 +190,9 @@ def clean_post_data(current_folder: str, influencerID: int) -> None:
         if "coauthorProducers" in _dict:
             handle_coauthors(_dict['id'], _dict['coauthorProducers'])
 
-        handle_hashtags(_dict['id'], _dict['hashtags'])
+        handle_hashtags(_dict['id'], _dict['hashtags'], postgres)
 
     postgres.close_connection()
 
 if __name__=="__main__":
-    clean_post_data("../data/waniaaanadeem", 2257633956)
+    ...
