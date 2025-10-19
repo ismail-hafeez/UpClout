@@ -1,4 +1,3 @@
-from datetime import datetime
 import time
 
 import importlib
@@ -13,8 +12,6 @@ import apify_class
 importlib.reload(apify_class)
 from apify_class import Apify
 
-DATA_PATH = "../data"
-
 def get_influencer_list() -> list[str]:
 
     with open("../insta_profiles.txt", "r") as file:
@@ -22,13 +19,9 @@ def get_influencer_list() -> list[str]:
 
     return influencers
 
-def write_to_log_file(message: str) -> None:
-
-    PATH="../logs"
-    # Writing to log file
-    with open(f"{PATH}/time_ETL.log", "a", encoding="utf-8") as file:
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        file.write(f"[{timestamp}] - {message}\n")
+def already_processed(username: str) -> bool:
+    with open("../processed_influencers.txt", "r") as f:
+        return username in {line.strip() for line in f}
 
 def ETL():
     
@@ -37,46 +30,28 @@ def ETL():
     influencers = get_influencer_list()
     
     for idx, influencer in enumerate(influencers):
-        #start = time.time()
-        #path = extract.scrape_influencer(influencer) # Extract
-        #end = time.time()
-        #mssg: str = f"{influencer} EXTRACTION time: {end - start:.4f} seconds"
-        #write_to_log_file(mssg)
 
-        path = f"../data/{influencer}"
-        print(f"Current Influencer: {influencer}")
+        if already_processed(influencer):
+            continue
 
-        start = time.time()
+        path = extract.scrape_influencer(influencer, apify) # Extract
         influencerID = clean.clean_meta_data(path) # Transform I
-        end = time.time()
-        mssg: str = f"{influencer} META DATA CLEANING time: {end - start:.4f} seconds"
-        write_to_log_file(mssg)
-
-        start = time.time()
-        clean.clean_post_data(path, influencerID) # Transform II
-        end = time.time()
-        mssg: str = f"{influencer} META POST CLEANING + LOADING time: {end - start:.4f} seconds"
-        write_to_log_file(mssg)
-
-        start = time.time()
         postgres.load_influencer_table(path) # Load
-        end = time.time()
-        mssg: str = f"{influencer} LOADING (MD) time: {end - start:.4f} seconds"
-        write_to_log_file(mssg)
+        clean.clean_post_data(path, influencerID) # Transform II
 
         # Switch APIs every 5 scrapes
-        if idx % 3 == 0:
+        if idx % 5 == 0:
             print("Rotating APIs")
             apify.rotate_apis()
             time.sleep(5)
             print("Sleeping for 5 seconds ... ")  
-        if idx == 10:
+
+        if idx == 50:
             break
     
     postgres.close_connection()
 
 if __name__=="__main__":
-    #postgres = Postgres()
     
     start = time.time()      
     ETL()

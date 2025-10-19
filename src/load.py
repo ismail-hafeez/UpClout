@@ -1,7 +1,7 @@
 import psycopg2
-from datetime import datetime
 import os
 import pandas as pd
+import log
 
 class Postgres:
     def __init__(self):
@@ -9,15 +9,6 @@ class Postgres:
         self.cur = self.conn.cursor()
 
     # -- Helper Functions -- #
-
-    def write_to_log_file(self, message: str) -> None:
-
-        PATH="../logs"
-        #PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "logs"))
-        # Writing to log file
-        with open(f"{PATH}/load.log", "a", encoding="utf-8") as file:
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            file.write(f"[{timestamp}] - {message}\n")
             
     def extract_dict_meta_data(self, PATH: str) -> list:
         csv_file = None
@@ -37,12 +28,10 @@ class Postgres:
         self.cur.close()
         self.conn.close()
 
-    # -- Storage Function -- #
+    # -- Storage Functions -- #
 
     def load_influencer_table(self, PATH: str) -> None:
-        
         _dict = self.extract_dict_meta_data(PATH)
-        response: str
         try:
             query = """
                 INSERT INTO Influencers (
@@ -66,18 +55,16 @@ class Postgres:
             self.cur.execute(query, tuple(_dict.values()))
             self.conn.commit()
 
-            response = f"{_dict['username']}'s Data Inserted Successfully in Influencer Table"
+            response = f"{_dict['username']}'s Data Inserted Successfully"
 
         except Exception as e:
-            response = f"{_dict['username']}'s Data Insertion in Influencer Table enountered error: {e}"
+            response = f"{_dict['username']}'s Data Insertion enountered error: {e}"
 
         finally:
-            self.write_to_log_file(response)
+            log.log_influencer_table(response)
 
     def load_brand_table(self, PATH: str) -> None:
-
         _dict = self.extract_dict_meta_data(PATH)
-        response: str
         try:
             query = """
                 INSERT INTO Brands (
@@ -101,13 +88,13 @@ class Postgres:
             self.cur.execute(query, tuple(_dict.values()))
             self.conn.commit()
 
-            response = f"{_dict['username']}'s Data Inserted Successfully in Brands Table"
+            response = f"{_dict['username']}'s Data Inserted Successfully"
 
         except Exception as e:
-            response = f"{_dict['username']}'s Data Insertion in Brands Table enountered error: {e}"
+            response = f"{_dict['username']}'s Data Insertion enountered error: {e}"
 
         finally:
-            self.write_to_log_file(response)
+            log.log_brand_table(response)
 
     def load_hashtags_table(self, hashtag: str) -> None:
         response: str
@@ -121,12 +108,12 @@ class Postgres:
             self.cur.execute(query, (hashtag,))
             self.conn.commit()
 
-            response = f"{hashtag} Successfully Inserted in Hashtags Table"
+            response = f"{hashtag} Successfully Inserted"
         except Exception as e:
-            response = f"{hashtag} Insertion in Hashtags Table enountered error: {e}"
+            response = f"{hashtag} Insertion enountered error: {e}"
 
         finally:
-            self.write_to_log_file(response)
+            log.log_hashtags_table(response)
 
     def load_posts_hashtags_table(self, postID_hashID: tuple) -> None:
         response: str
@@ -139,12 +126,12 @@ class Postgres:
             self.cur.executemany(query, postID_hashID)
             self.conn.commit()
 
-            response = "Successfully Inserted in Hashtags and Posts Table"
+            response = f"{postID_hashID} Successfully Inserted"
         except Exception as e:
-            response = f"Hashtags and Posts Table Insertion enountered error: {e}"
+            response = f"{postID_hashID} Insertion enountered error: {e}"
 
         finally:
-            self.write_to_log_file(response)
+            log.log_posts_hashtags_table(response)
 
     def load_posts_table(self, _dict: dict) -> None:
         try:
@@ -179,13 +166,13 @@ class Postgres:
             self.cur.execute(query, values)
             self.conn.commit()
 
-            response = f"{_dict.get('id')} Post Inserted Successfully in Post Table"
+            response = f"{_dict.get('id')} Inserted Successfully"
 
         except Exception as e:
-            response = f"{_dict.get('id')} Post Insertion in Post Table encountered error: {e}"
+            response = f"{_dict.get('id')} Insertion encountered error: {e}"
 
         finally:
-            self.write_to_log_file(response)
+            log.log_posts_table(response)
 
     def load_taggedUsers(self, id: int, username: str) -> None:
         try:
@@ -203,13 +190,13 @@ class Postgres:
             self.cur.execute(query, values)
             self.conn.commit()
 
-            response = f"{username} Inserted Successfully in TaggedUser Table"
+            response = f"{username} Inserted Successfully"
 
         except Exception as e:
-            response = f"{username} Insertion in TaggedUser Table encountered error: {e}"
+            response = f"{username} Insertion encountered error: {e}"
 
         finally:
-            self.write_to_log_file(response)
+            log.log_taggedUsers_table(response)
 
     def load_posts_taggedUsers(self, postid: int, taggedUserid: int) -> None:
         try:
@@ -226,11 +213,11 @@ class Postgres:
             self.cur.execute(query, values)
             self.conn.commit()
 
-            response = "Successfully Inserted Successfully in Posts_TaggedUser Table"
+            response = f"{values} Successfully Inserted Successfully"
 
         except Exception as e:
-            response = f"Insertion in Posts_TaggedUser Table encountered error: {e}"
+            response = f"{values} Insertion encountered error: {e}"
 
         finally:
-            self.write_to_log_file(response)
+            log.log_posts_taggedUsers_table(response)
 
