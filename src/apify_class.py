@@ -88,8 +88,6 @@ class Apify:
     def scrape_post_data(self, instaprofile: str) -> None:
 
         PATH=self.make_folder(instaprofile)
-        log_message: str
-
         run_input = {
             "directUrls": [f"https://www.instagram.com/{instaprofile}/"], 
             "resultsType": "posts", 
@@ -112,8 +110,6 @@ class Apify:
     def scrape_meta_data(self, instaprofile: str) -> None:
 
         PATH=self.make_folder(instaprofile)
-        log_message: str
-
         run_input = {
             "directUrls": [f"https://www.instagram.com/{instaprofile}/"], 
             "resultsType": "details", 

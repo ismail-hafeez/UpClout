@@ -3,14 +3,10 @@ import json
 import os, re
 import shutil
 from datetime import datetime, timezone
-import load
-import importlib
-importlib.reload(load)
+
 from load import Postgres
 import psycopg2
 
-import apify_class
-importlib.reload(apify_class)
 from apify_class import Apify
 
 def get_post_dict(current_folder: str) -> list[dict]:

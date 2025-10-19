@@ -2,7 +2,7 @@ from datetime import datetime
 
 # -- create_database.py -- #
 def log_db_donfig(message: str) -> None:
-    PATH = "../../logs/db_config"
+    PATH = "../logs/db_config"
     # Writing to log file
     with open(f"{PATH}/create_database.log", "a", encoding="utf-8") as file:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -55,5 +55,36 @@ def log_posts_taggedUsers_table(message: str) -> None:
     PATH = "../logs/load"
     # Writing to log file
     with open(f"{PATH}/posts_taggedUsers.log", "a", encoding="utf-8") as file:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        file.write(f"[{timestamp}] - {message}\n")
+
+# -- post_data.py -- #
+def log_post_data(message: str) -> None:
+    PATH = "../logs/transform"
+    # Writing to log file
+    with open(f"{PATH}/post_data.log", "a", encoding="utf-8") as file:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        file.write(f"[{timestamp}] - {message}\n")
+
+# -- meta_data.py -- #
+def log_meta_data(message: str) -> None:
+    PATH = "../logs/transform"
+    # Writing to log file
+    with open(f"{PATH}/meta_data.log", "a", encoding="utf-8") as file:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        file.write(f"[{timestamp}] - {message}\n")
+
+# -- apify_class.py -- #
+def log_extract_meta_data(message: str) -> None:
+    PATH = "../logs/extract"
+    # Writing to log file
+    with open(f"{PATH}/meta_data_scraping.log", "a", encoding="utf-8") as file:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        file.write(f"[{timestamp}] - {message}\n")
+
+def log_extract_post_data(message: str) -> None:
+    PATH = "../logs/extract"
+    # Writing to log file
+    with open(f"{PATH}/post_data_scraping.log", "a", encoding="utf-8") as file:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         file.write(f"[{timestamp}] - {message}\n")

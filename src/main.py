@@ -1,15 +1,8 @@
 import time
-
-import importlib
 import extract
-importlib.reload(extract)
-import clean
-importlib.reload(clean)
-import load
-importlib.reload(load)
+import meta_data
+import post_data
 from load import Postgres
-import apify_class
-importlib.reload(apify_class)
 from apify_class import Apify
 
 def get_influencer_list() -> list[str]:
@@ -35,9 +28,9 @@ def ETL():
             continue
 
         path = extract.scrape_influencer(influencer, apify) # Extract
-        influencerID = clean.clean_meta_data(path) # Transform I
+        influencerID = meta_data.clean_meta_data(path) # Transform I
         postgres.load_influencer_table(path) # Load
-        clean.clean_post_data(path, influencerID) # Transform II
+        post_data.clean_post_data(path, influencerID) # Transform II
 
         # Switch APIs every 5 scrapes
         if idx % 5 == 0:
