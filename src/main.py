@@ -25,10 +25,9 @@ def already_processed(username: str) -> bool:
     with open("../processed_influencers.txt", "r") as f:
         return username in {line.strip() for line in f}
 
-def keep_track_influencers(influencers: list[str]) -> None:
+def keep_track_influencers(influencer: str) -> None:
     with open("../processed_influencers.txt", "a") as f:
-        for influencer in influencers:
-            f.write(f"{influencer}\n")
+        f.write(f"{influencer}\n")
 
 def isPrivate(response: any, username: str) -> bool:
     if response == 0:
@@ -41,9 +40,7 @@ def ETL():
     apify = Apify()
     postgres = Postgres()
     influencers = get_influencer_list()
-
-    influencers_added = []
-    
+   
     for idx, influencer in enumerate(influencers):
 
         if already_processed(influencer):
@@ -64,18 +61,17 @@ def ETL():
         postgres.load_influencer_table(path) # Load
         post_data.clean_post_data(path, influencerID) # Transform II
 
-        influencers_added.append(influencer)  
+        # dump in txt file
+        keep_track_influencers(influencer)  
 
         # Switch APIs every 5 scrapes
-        if idx % 5 == 0:
+        if idx % 2 == 0:
             print("Rotating APIs")
             apify.rotate_apis()
             time.sleep(5)
-            # dump in txt file
-            keep_track_influencers(influencers_added)  
             print("Sleeping for 5 seconds ... ")  
 
-        if idx == 50:
+        if idx == 10:
             break
     
     postgres.close_connection()

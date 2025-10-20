@@ -126,6 +126,7 @@ class Apify:
             if data[0]['private'] == True:
                 log_message = "Skipping because Private"
                 return 0
+                # Write some code that caters wring username URL (Not Found)
             
             df = self.save_to_csv(PATH, data)
             # Downloading Profile Picture

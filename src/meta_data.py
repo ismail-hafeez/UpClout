@@ -126,6 +126,7 @@ def clean_meta_data(current_folder: str) -> int:
             csv_file = os.path.join(current_folder, file)
             break
     df = pd.read_csv(csv_file)
+    
     # Cleaning Biography
     df = clean_bio(df)
     # Get location if any
