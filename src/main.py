@@ -1,6 +1,6 @@
 import time
 import shutil
-import os
+import os, json
 import extract
 import meta_data
 import post_data
@@ -34,6 +34,20 @@ def isPrivate(response: any, username: str) -> bool:
     if response == 0:
         delete_folder(f"../data/{username}")
         return True
+    
+    json_file = None
+    for file in os.listdir(f"../data/{username}"):
+        if file.endswith(".json"):
+            json_file = os.path.join(f"../data/{username}", file)
+            break
+    with open(json_file, "r", encoding="utf-8") as file:
+        data = json.load(file)
+
+    if data[0]['error'] == "not_found" or data[0]['errorDescription'] == "Post does not exist":
+        log.log_skipped_influencer(f"{username} Extract failed - PROFILE NOT FOUND")
+        delete_folder(f"../data/{username}")
+        return True
+
     return False
 
 def ETL():
@@ -44,6 +58,8 @@ def ETL():
    
     for idx, influencer in enumerate(influencers):
 
+        influencer="pakistani_.beauty"
+
         if already_processed(influencer):
             continue
 
@@ -51,7 +67,7 @@ def ETL():
         try:
             path = extract.scrape_influencer(influencer, apify) # Extract
         except Exception as e:
-            log.log_skipped_influencer(influencer, f"Extract failed — {e}")
+            log.log_skipped_influencer(f"{influencer}Extract failed — {e}")
             continue
 
         # If scraper failed or profile invalid
@@ -61,8 +77,11 @@ def ETL():
 
         # Skipping if private 
         if isPrivate(path, influencer):
+            print("private passed")
+            break
             continue        
-
+        print("private failed")
+        break
         influencerID = meta_data.clean_meta_data(path) # Transform I
         postgres.load_influencer_table(path) # Load
         post_data.clean_post_data(path, influencerID) # Transform II
