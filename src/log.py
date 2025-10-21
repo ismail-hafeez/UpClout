@@ -88,3 +88,11 @@ def log_extract_post_data(message: str) -> None:
     with open(f"{PATH}/post_data_scraping.log", "a", encoding="utf-8") as file:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         file.write(f"[{timestamp}] - {message}\n")
+
+# -- main.py -- #
+def log_skipped_influencer(message: str) -> None:
+    PATH = "../logs"
+    # Writing to log file
+    with open(f"{PATH}/skipped_influencer.log", "a", encoding="utf-8") as file:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        file.write(f"[{timestamp}] - {message}\n")

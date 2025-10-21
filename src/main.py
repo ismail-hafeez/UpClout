@@ -6,6 +6,7 @@ import meta_data
 import post_data
 from load import Postgres
 from apify_class import Apify
+import log
 
 def delete_folder(path: str) -> None:
     if os.path.exists(path) and os.path.isdir(path):
@@ -46,7 +47,12 @@ def ETL():
         if already_processed(influencer):
             continue
 
-        path = extract.scrape_influencer(influencer, apify) # Extract
+        # Extract
+        try:
+            path = extract.scrape_influencer(influencer, apify) # Extract
+        except Exception as e:
+            log.log_skipped_influencer(influencer, f"Extract failed — {e}")
+            continue
 
         # If scraper failed or profile invalid
         if not path:
