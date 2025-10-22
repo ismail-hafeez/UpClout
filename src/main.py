@@ -58,8 +58,6 @@ def ETL():
    
     for idx, influencer in enumerate(influencers):
 
-        influencer="pakistani_.beauty"
-
         if already_processed(influencer):
             continue
 
@@ -70,18 +68,10 @@ def ETL():
             log.log_skipped_influencer(f"{influencer}Extract failed — {e}")
             continue
 
-        # If scraper failed or profile invalid
-        if not path:
-            print(f"Skipping {influencer} — invalid or deleted profile.")
-            continue
-
         # Skipping if private 
         if isPrivate(path, influencer):
-            print("private passed")
-            break
             continue        
-        print("private failed")
-        break
+
         influencerID = meta_data.clean_meta_data(path) # Transform I
         postgres.load_influencer_table(path) # Load
         post_data.clean_post_data(path, influencerID) # Transform II
@@ -90,7 +80,7 @@ def ETL():
         keep_track_influencers(influencer)  
 
         # Switch APIs every 5 scrapes
-        if idx % 2 == 0:
+        if idx % 5 == 0:
             print("Rotating APIs")
             apify.rotate_apis()
             time.sleep(5)
