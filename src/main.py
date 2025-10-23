@@ -30,25 +30,33 @@ def keep_track_influencers(influencer: str) -> None:
     with open("../processed_influencers.txt", "a") as f:
         f.write(f"{influencer}\n")
 
-def isPrivate(response: any, username: str) -> bool:
-    if response == 0:
-        delete_folder(f"../data/{username}")
-        return True
-    
+def get_post_data_dict(path: str) -> dict:
     json_file = None
-    for file in os.listdir(f"../data/{username}"):
+    for file in os.listdir(path):
         if file.endswith(".json"):
-            json_file = os.path.join(f"../data/{username}", file)
+            json_file = os.path.join(path, file)
             break
     with open(json_file, "r", encoding="utf-8") as file:
         data = json.load(file)
 
-    if data[0]['error'] == "not_found" or data[0]['errorDescription'] == "Post does not exist":
-        log.log_skipped_influencer(f"{username} Extract failed - PROFILE NOT FOUND")
-        delete_folder(f"../data/{username}")
-        return True
+    return data[0]
 
-    return False
+def isPrivate(response: any, username: str) -> bool:   
+    path: str = f"../data/{username}"
+         
+    if response == 0:
+        delete_folder(path)
+        return True
+    else:
+        user_dict = get_post_data_dict(path)
+
+        if 'error' in user_dict.keys():
+            if user_dict['error'] == "not_found" or user_dict['errorDescription'] == "Post does not exist":
+                log.log_skipped_influencer(f"{username} Extract failed - PROFILE NOT FOUND")
+                delete_folder(path)
+                return True
+        else:
+            return False
 
 def ETL():
     
@@ -57,6 +65,18 @@ def ETL():
     influencers = get_influencer_list()
    
     for idx, influencer in enumerate(influencers):
+
+        # Switch APIs every 5 scrapes
+        if idx % 5 == 0:
+            print("Rotating APIs")
+            apify.rotate_apis()
+            time.sleep(5)
+            print("Sleeping for 5 seconds ... ")  
+
+        if idx == 10:
+            break
+
+        print(f"{idx}: {influencer}")
 
         if already_processed(influencer):
             continue
@@ -78,16 +98,6 @@ def ETL():
 
         # dump in txt file
         keep_track_influencers(influencer)  
-
-        # Switch APIs every 5 scrapes
-        if idx % 5 == 0:
-            print("Rotating APIs")
-            apify.rotate_apis()
-            time.sleep(5)
-            print("Sleeping for 5 seconds ... ")  
-
-        if idx == 10:
-            break
     
     postgres.close_connection()
 

@@ -124,9 +124,9 @@ class Apify:
             data = self.run_actor(run_input)
             # If Private Account
             if data[0]['private'] == True:
-                log_message = "Skipping because Private"
+                log_message = f"Skipping user: {instaprofile} because Private"
+                log.log_skipped_influencer(log_message)
                 return 0
-                # Write some code that caters wring username URL (Not Found)
             
             df = self.save_to_csv(PATH, data)
             # Downloading Profile Picture
