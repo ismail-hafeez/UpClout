@@ -63,23 +63,25 @@ def ETL():
     apify = Apify()
     postgres = Postgres()
     influencers = get_influencer_list()
+
+    count: int = 0
    
     for idx, influencer in enumerate(influencers):
 
+        if already_processed(influencer):
+            continue
+
         # Switch APIs every 5 scrapes
-        if idx % 5 == 0:
+        if count % 3 == 0:
             print("Rotating APIs")
             apify.rotate_apis()
-            time.sleep(5)
             print("Sleeping for 5 seconds ... ")  
+            time.sleep(5)
 
-        if idx == 10:
+        if count == 10:
             break
 
         print(f"{idx}: {influencer}")
-
-        if already_processed(influencer):
-            continue
 
         # Extract
         try:
@@ -98,7 +100,8 @@ def ETL():
 
         # dump in txt file
         keep_track_influencers(influencer)  
-    
+        count+=1
+
     postgres.close_connection()
 
 if __name__=="__main__":
