@@ -72,14 +72,15 @@ def ETL():
             continue
 
         # Switch APIs every 5 scrapes
-        if count % 3 == 0:
+        if count % 4 == 0:
             print("Rotating APIs")
             apify.rotate_apis()
             print("Sleeping for 5 seconds ... ")  
             time.sleep(5)
 
         if count == 10:
-            break
+            print("Taking long break ... ")  
+            time.sleep(60)
 
         print(f"{idx}: {influencer}")
 
@@ -96,7 +97,7 @@ def ETL():
 
         influencerID = meta_data.clean_meta_data(path) # Transform I
         postgres.load_influencer_table(path) # Load
-        post_data.clean_post_data(path, influencerID) # Transform II
+        post_data.clean_post_data(path, influencerID) # Transform II + Load
 
         # dump in txt file
         keep_track_influencers(influencer)  
