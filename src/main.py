@@ -64,7 +64,7 @@ def ETL():
     postgres = Postgres()
     influencers = get_influencer_list()
 
-    count: int = 0
+    count: int = 1
    
     for idx, influencer in enumerate(influencers):
 
