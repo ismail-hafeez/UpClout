@@ -131,7 +131,8 @@ class CreateDataBase:
                 is_collaboration BOOLEAN,
                 created_at TIMESTAMP
                 ownerID BIGINT,
-                FOREIGN KEY (ownerID) REFERENCES influencer(influencerID)
+                FOREIGN KEY (ownerID) REFERENCES influencers(influencerID),
+                FOREIGN KEY (ownerBRANDID) REFERENCES brands(brandID)
             );
             """
 

@@ -145,7 +145,7 @@ class Postgres:
                     likesCount,
                     timestamp,
                     isSponsored,
-                    ownerid
+                    ownerid,
                 )
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (postID) DO NOTHING;
@@ -160,6 +160,49 @@ class Postgres:
                 _dict.get("likesCount"),
                 _dict.get("timestamp"),
                 _dict.get("isSponsored"),
+                _dict.get("ownerID_TEMP")
+            )
+
+            self.cur.execute(query, values)
+            self.conn.commit()
+
+            response = f"{_dict.get('id')} Inserted Successfully"
+
+        except Exception as e:
+            response = f"{_dict.get('id')} Insertion encountered error: {e}"
+
+        finally:
+            log.log_posts_table(response)
+
+    def load_brand_posts_table(self, _dict: dict) -> None:
+        try:
+            query = """
+                INSERT INTO Posts (
+                    postID,
+                    type,
+                    caption,
+                    url,
+                    commentsCount,
+                    likesCount,
+                    timestamp,
+                    isSponsored,
+                    ownerid,
+                    ownerbrandid
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (postID) DO NOTHING;
+            """
+
+            values = (
+                _dict.get("id"),
+                _dict.get("type"),
+                _dict.get("caption"),
+                _dict.get("url"),
+                _dict.get("commentsCount"),
+                _dict.get("likesCount"),
+                _dict.get("timestamp"),
+                _dict.get("isSponsored"),
+                None,
                 _dict.get("ownerID_TEMP")
             )
 

@@ -96,3 +96,11 @@ def log_skipped_influencer(message: str) -> None:
     with open(f"{PATH}/skipped_influencer.log", "a", encoding="utf-8") as file:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         file.write(f"[{timestamp}] - {message}\n")
+
+# -- main_brand.py -- #
+def log_skipped_brand(message: str) -> None:
+    PATH = "../logs"
+    # Writing to log file
+    with open(f"{PATH}/skipped_brand.log", "a", encoding="utf-8") as file:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        file.write(f"[{timestamp}] - {message}\n")

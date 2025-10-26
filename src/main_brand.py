@@ -65,7 +65,7 @@ def ETL():
     brands = get_brand_list()
 
     count: int = 1
-   
+
     for brand in brands:
 
         if already_processed(brand):
@@ -79,6 +79,7 @@ def ETL():
             time.sleep(5)
 
         if count == 10:
+            break
             print("Taking long break ... ")  
             time.sleep(60)
 
@@ -86,18 +87,18 @@ def ETL():
 
         # Extract
         try:
-            path = extract.scrape_influencer(brand, apify) # Extract
+            path = extract.scrape_brand(brand, apify) # Extract
         except Exception as e:
             log.log_skipped_brand(f"{brand}Extract failed — {e}")
             continue
 
         # Skipping if private 
         if isPrivate(path, brand):
-            continue        
+            continue    
 
-        influencerID = meta_data.clean_meta_data(path) # Transform I
-        postgres.load_influencer_table(path) # Load
-        post_data.clean_post_data(path, influencerID) # Transform II + Load
+        brandID = meta_data.clean_meta_data(path) # Transform I
+        #postgres.load_brand_table(path) # Load
+        post_data.clean_post_data(path, brandID) # Transform II + Load
 
         # dump in txt file
         keep_track_brands(brand)  

@@ -1,3 +1,5 @@
 select *
-from influencers
+from posts
+where ownerid is null;
+
 
