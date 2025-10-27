@@ -74,11 +74,11 @@ def ETL():
         # Switch APIs every 5 scrapes
         if count % 4 == 0:
             print("Rotating APIs")
-            apify.rotate_apis()
+            apify.rotate_apis(count)
             print("Sleeping for 5 seconds ... ")  
             time.sleep(5)
 
-        if count == 10:
+        if count == 15:
             break
             print("Taking long break ... ")  
             time.sleep(60)

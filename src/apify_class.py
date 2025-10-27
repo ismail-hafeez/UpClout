@@ -15,7 +15,7 @@ load_dotenv()
 
 class Apify:
     def __init__(self):
-        self.API_LIST = ['API_TOKEN_6', 'API_TOKEN', 'API_TOKEN_2', 'API_TOKEN_5', 'API_TOKEN_4', 'API_TOKEN_3']
+        self.API_LIST = ['API_TOKEN_3', 'API_TOKEN_3', 'API_TOKEN'] #removed API_6,4,5
         self.DATA_OUTPUT = "../data"
         self.rotate_apis()
 
@@ -65,7 +65,7 @@ class Apify:
         with open(f"{PATH}_post_data.json", "w") as file:
                 json.dump(data, file, indent=4)
 
-    def rotate_apis(self) -> None:
+    def rotate_apis(self, count: int = 0) -> None:
         """
         This function rotates between 6 APIs to cater with usage limit and 
         consecutive API calls from a single API
@@ -75,6 +75,8 @@ class Apify:
 
         self.API_TOKEN = os.getenv(current)
         self.client = ApifyClient(self.API_TOKEN)  
+
+        log.log_api_usage(f"Current: {current} | Count: {count}")
 
     # --- Scraper Functions --- #
 

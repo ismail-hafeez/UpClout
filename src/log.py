@@ -104,3 +104,11 @@ def log_skipped_brand(message: str) -> None:
     with open(f"{PATH}/skipped_brand.log", "a", encoding="utf-8") as file:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         file.write(f"[{timestamp}] - {message}\n")
+
+# -- apify_class.py -- #
+def log_api_usage(message: str) -> None:
+    PATH = "../logs/api"
+    # Writing to log file
+    with open(f"{PATH}/current_api.log", "a", encoding="utf-8") as file:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        file.write(f"[{timestamp}] - {message}\n")
