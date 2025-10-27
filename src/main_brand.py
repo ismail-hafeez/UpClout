@@ -91,13 +91,13 @@ def ETL():
         except Exception as e:
             log.log_skipped_brand(f"{brand}Extract failed — {e}")
             continue
-
+        
         # Skipping if private 
         if isPrivate(path, brand):
-            continue    
+            continue   
 
         brandID = meta_data.clean_meta_data(path) # Transform I
-        #postgres.load_brand_table(path) # Load
+        postgres.load_brand_table(path) # Load
         post_data.clean_post_data(path, brandID) # Transform II + Load
 
         # dump in txt file

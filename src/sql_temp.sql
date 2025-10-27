@@ -1,5 +1,4 @@
-select *
-from posts
-where ownerid is null;
+select * 
+from brands
 
 
