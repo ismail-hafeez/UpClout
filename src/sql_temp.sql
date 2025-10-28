@@ -10,3 +10,6 @@ WHERE i.username = 'inaseemshah'
 GROUP BY h.tag_name
 ORDER BY use_count DESC
 LIMIT 5
+
+SELECT *
+FROM brands
