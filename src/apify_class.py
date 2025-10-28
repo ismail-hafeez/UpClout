@@ -15,7 +15,7 @@ load_dotenv()
 
 class Apify:
     def __init__(self):
-        self.API_LIST = ['API_TOKEN_2', 'API_TOKEN_3', 'API_TOKEN'] #removed API_6,4,5
+        self.API_LIST = ['API_TOKEN_2', 'API_TOKEN', 'API_TOKEN'] #removed API_6,4,5,3
         self.DATA_OUTPUT = "../data"
         self.rotate_apis()
 
