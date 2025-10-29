@@ -68,7 +68,7 @@ def ETL():
 
     for brand in brands:
 
-        if already_processed(brand):
+        if already_processed(brand): 
             continue
 
         # Switch APIs every 5 scrapes
