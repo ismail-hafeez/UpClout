@@ -6,10 +6,10 @@ JOIN posts p
     ON p.postid = ph.post_id
 JOIN influencers i
     ON i.influencerid = p.ownerid
-WHERE i.username = 'inaseemshah'
+WHERE i.username = 'ayna.sulaiman'
 GROUP BY h.tag_name
 ORDER BY use_count DESC
-LIMIT 5
+LIMIT 5;
 
 SELECT *
-FROM brands
+FROM influencers
