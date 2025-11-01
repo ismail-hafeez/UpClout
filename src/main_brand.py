@@ -84,7 +84,6 @@ def ETL():
             time.sleep(60)
 
         print(f"{count}: {brand}")
-
         # Extract
         try:
             path = extract.scrape_brand(brand, apify) # Extract
@@ -103,6 +102,8 @@ def ETL():
         # dump in txt file
         keep_track_brands(brand)  
         count+=1
+
+        break
 
     postgres.close_connection()
 
