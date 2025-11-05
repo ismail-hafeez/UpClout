@@ -1,2 +1,2 @@
 SELECT *
-FROM influencers;
+FROM posts;

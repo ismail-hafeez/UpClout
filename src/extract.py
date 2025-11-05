@@ -22,4 +22,4 @@ def scrape_brand(username: str, apify: Apify) -> int | str:
     return f"../data/{username}"
 
 if __name__=="__main__":
-    ...
+    pass
