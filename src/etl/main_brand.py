@@ -93,8 +93,6 @@ def ETL():
         # Skipping if private 
         if isPrivate(path, brand):
             continue   
-
-        path = f'{brands_path}/{brand}'
         
         brandID = meta_data.clean_meta_data(path) # Transform I
         postgres.load_brand_table(path) # Load

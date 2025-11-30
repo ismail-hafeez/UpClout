@@ -17,7 +17,6 @@ def get_rising_star(postgres: Postgres) -> list:
     query = """
         SELECT influencerID, username, followers FROM Influencers WHERE followers < 100000;
     """
-
     postgres.cur.execute(query)
     
     return postgres.cur.fetchall()

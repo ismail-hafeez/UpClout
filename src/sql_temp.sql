@@ -1,6 +1,3 @@
-SELECT *
-FROM posts;
-
 CREATE TABLE rising_stars (
 	id BIGINT PRIMARY KEY,
 	username VARCHAR(255) UNIQUE,
@@ -11,6 +8,6 @@ CREATE TABLE rising_stars (
 	FOREIGN KEY (id) REFERENCES influencers(influencerID)
 );
 
-select *
-from brands
-where brandid = 1502869529
+
+
+
