@@ -79,7 +79,6 @@ def ETL():
             time.sleep(5)
 
         if count == 15:
-            break
             print("Taking long break ... ")  
             time.sleep(60)
 
@@ -95,6 +94,8 @@ def ETL():
         if isPrivate(path, brand):
             continue   
 
+        path = f'{brands_path}/{brand}'
+        
         brandID = meta_data.clean_meta_data(path) # Transform I
         postgres.load_brand_table(path) # Load
         post_data.clean_post_data(path, brandID) # Transform II + Load
@@ -102,9 +103,7 @@ def ETL():
         # dump in txt file
         keep_track_brands(brand)  
         count+=1
-
-        break
-
+   
     postgres.close_connection()
 
 if __name__=="__main__":

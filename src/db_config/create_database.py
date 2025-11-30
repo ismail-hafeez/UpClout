@@ -1,6 +1,12 @@
 import psycopg2
 from dotenv import load_dotenv
-import log 
+import sys
+import os
+
+# Add the project root directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
+from src import log 
 
 # Load environment variables
 load_dotenv()
@@ -229,6 +235,25 @@ class CreateDataBase:
         finally:
             log.log_db_donfig(response)
 
+    def rising_stars_table(self) -> None:
+        try:
+            query = """
+                CREATE TABLE IF NOT EXISTS rising_stars (
+                    id BIGINT PRIMARY KEY,
+                    username VARCHAR(255) UNIQUE,
+                    followers BIGINT,
+                    date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (id) REFERENCES influencers(influencerID)
+                );
+            """
+            self.cur.execute(query)
+            self.conn.commit()
+            response = "Rising Stars Table created successfully"
+        except Exception as e:
+            response = f"Rising Stars Table encountered error: {e}"
+        finally:
+            log.log_db_donfig(response)
+
     def create_db(self) -> str:
         try:
             # -- All the tables -- #
@@ -240,6 +265,7 @@ class CreateDataBase:
             self.posts_hashtags_table()
             self.taggedUser_table()
             self.posts_taggedUser_table()
+            self.rising_stars_table()
             # ... add more tables here
 
             self.conn.commit()
