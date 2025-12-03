@@ -1,6 +1,8 @@
 apify-client
 ipykernel
-dotenv
+python-dotenv
+langchain-google-vertexai
+google-cloud-aiplatform
 pandas
 psycopg2
 requests
@@ -9,3 +11,7 @@ requests_html
 lxml_html_clean 
 selenium
 joblib
+google-genai
+pymongo[srv]
+langchain
+langgraph

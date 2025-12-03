@@ -1,28 +1,30 @@
-from langchain_google_vertexai import (
-    VertexAI, VertexAIEmbeddings, 
-    VectorSearchVectorStore)
+from langchain_google_vertexai import VertexAI, VertexAIEmbeddings
+from langchain_chroma import Chroma
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
-# loading env variables
-PROJECT_ID=os.getenv("PROJECT_ID")
-REGION=os.getenv("REGION")
-INDEX_ID=os.getenv("INDEX_ID")
-ENDPOINT_ID=os.getenv("ENDPOINT_ID")
-BUCKET_NAME=os.getenv("BUCKET_NAME")
 
-# Initializing vector store
-embeddings = VertexAIEmbeddings(model_name="text-embedding-005") 
-vector_store =  VectorSearchVectorStore.from_components(
-    project_id=PROJECT_ID,
-    region=REGION,
-    gcs_bucket_name=BUCKET_NAME,
-    index_id=INDEX_ID,
-    endpoint_id=ENDPOINT_ID,
-    embedding=embeddings,
-    batch_size=1000,
-    stream_update=True
+# Loading env variables
+PROJECT_ID = os.getenv("PROJECT_ID")
+REGION = os.getenv("REGION")
+
+# ChromaDB configuration
+CHROMA_DB_PATH = os.getenv("CHROMA_DB_PATH", "./chroma_db")  # Local persistent directory
+COLLECTION_NAME = os.getenv("COLLECTION_NAME", "upclout_profiles")
+
+# Initialize embeddings using Vertex AI text-embedding-005
+embeddings = VertexAIEmbeddings(
+    model_name="text-embedding-005",
+    project=PROJECT_ID,
+    location=REGION
+)
+
+# Initialize ChromaDB vector store
+vector_store = Chroma(
+    collection_name=COLLECTION_NAME,
+    embedding_function=embeddings,
+    persist_directory=CHROMA_DB_PATH
 )
 
 # Prompt
@@ -38,5 +40,9 @@ instruction = (
     "- Use bullet points for listing multiple items or metrics for clarity."
 )
 
-# LLM Model
-llm = VertexAI(model_name="gemini-2.5-flash")
+# LLM Model - Gemini 2.5 Flash
+llm = VertexAI(
+    model_name="gemini-2.5-flash",
+    project=PROJECT_ID,
+    location=REGION
+)
