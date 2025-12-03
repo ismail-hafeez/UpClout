@@ -2,6 +2,7 @@
 langchain>=0.1.0
 langchain-google-vertexai>=1.0.0
 langchain-chroma>=0.1.0
+langchain-text-splitters>=0.1.0
 
 # ChromaDB
 chromadb>=0.4.22
