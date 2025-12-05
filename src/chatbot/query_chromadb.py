@@ -3,22 +3,28 @@ Query ChromaDB using LangChain for semantic search with Gemini 2.5 Flash.
 Includes specialized functions for influencer discovery and filtering.
 """
 
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
 from typing import List, Dict, Any, Optional
 from config.vertex_config import vector_store, llm, instruction
 
 
+def format_docs(docs):
+    """Format documents for context."""
+    return "\n\n".join([f"Document {i+1}:\n{doc.page_content}" for i, doc in enumerate(docs)])
+
+
 def create_rag_chain(retriever_k: int = 5):
     """
-    Create a RAG (Retrieval-Augmented Generation) chain using LangChain.
+    Create a RAG (Retrieval-Augmented Generation) chain using LangChain LCEL.
     
     Args:
         retriever_k: Number of documents to retrieve for context
         
     Returns:
-        RetrievalQA chain
+        Runnable RAG chain
     """
     # Create retriever from vector store
     retriever = vector_store.as_retriever(
@@ -38,21 +44,20 @@ User Question: {{question}}
 Answer:
 """
     
-    PROMPT = PromptTemplate(
+    prompt = PromptTemplate(
         template=prompt_template,
         input_variables=["context", "question"]
     )
     
-    # Create RetrievalQA chain
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=retriever,
-        return_source_documents=True,
-        chain_type_kwargs={"prompt": PROMPT}
+    # Create RAG chain using LCEL
+    rag_chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
     )
     
-    return qa_chain
+    return rag_chain, retriever
 
 
 def query_chromadb(question: str, k: int = 5) -> dict:
@@ -66,9 +71,19 @@ def query_chromadb(question: str, k: int = 5) -> dict:
     Returns:
         Dictionary with 'result' and 'source_documents'
     """
-    qa_chain = create_rag_chain(retriever_k=k)
-    response = qa_chain.invoke({"query": question})
-    return response
+    rag_chain, retriever = create_rag_chain(retriever_k=k)
+    
+    # Get the answer
+    result = rag_chain.invoke(question)
+    
+    # Get source documents
+    source_documents = retriever.invoke(question)
+    
+    return {
+        "result": result,
+        "source_documents": source_documents
+    }
+
 
 
 def similarity_search(query: str, k: int = 5, filter_dict: Optional[Dict] = None) -> List[Document]:
@@ -377,32 +392,147 @@ def print_search_results(results: List[Document], show_metadata: bool = True):
         print("-" * 80)
 
 
+def interactive_query():
+    """
+    Interactive query interface for the chatbot.
+    Allows users to enter custom queries and choose search modes.
+    """
+    print("=" * 80)
+    print("🤖 UpClout Influencer Chatbot - Interactive Mode")
+    print("=" * 80)
+    print("\nWelcome! Ask me anything about influencers in the database.")
+    print("Type 'exit' or 'quit' to end the session.\n")
+    
+    while True:
+        print("\n" + "-" * 80)
+        print("Choose a search mode:")
+        print("  1. 💬 AI Chat (RAG with Gemini) - Ask natural language questions")
+        print("  2. 🔍 Similarity Search - Find similar influencers")
+        print("  3. ⭐ Rising Stars - High engagement, 10K-100K followers")
+        print("  4. 🏆 Top Influencers - 100K+ followers")
+        print("  5. 👤 Specific Influencer - Look up by username")
+        print("  6. 📊 Compare Influencers - Compare multiple influencers")
+        print("  0. ❌ Exit")
+        print("-" * 80)
+        
+        mode = input("\nSelect mode (0-6): ").strip()
+        
+        if mode == "0" or mode.lower() in ["exit", "quit"]:
+            print("\n👋 Thanks for using UpClout Chatbot! Goodbye!")
+            break
+        
+        elif mode == "1":
+            # AI Chat with RAG
+            query = input("\n💬 Enter your question: ").strip()
+            if not query or query.lower() in ["exit", "quit"]:
+                continue
+            
+            k = input("Number of sources to analyze (default 5): ").strip()
+            k = int(k) if k.isdigit() else 5
+            
+            print("\n🤔 Thinking...")
+            response = query_chromadb(query, k=k)
+            
+            print("\n" + "=" * 80)
+            print(f"🤖 Answer:\n{response['result']}")
+            print("\n" + "=" * 80)
+            print(f"📚 Analyzed {len(response['source_documents'])} influencer(s)")
+            
+        elif mode == "2":
+            # Similarity Search
+            query = input("\n🔍 Enter search query: ").strip()
+            if not query or query.lower() in ["exit", "quit"]:
+                continue
+            
+            k = input("Number of results (default 5): ").strip()
+            k = int(k) if k.isdigit() else 5
+            
+            results = similarity_search(query, k=k)
+            print_search_results(results)
+            
+        elif mode == "3":
+            # Rising Stars
+            query = input("\n⭐ Enter category/niche (or press Enter for all): ").strip()
+            query = query if query else "rising influencers"
+            
+            min_eng = input("Minimum engagement rate % (default 3.0): ").strip()
+            min_eng = float(min_eng) if min_eng else 3.0
+            
+            k = input("Number of results (default 10): ").strip()
+            k = int(k) if k.isdigit() else 10
+            
+            results = find_rising_stars(query=query, min_engagement=min_eng, k=k)
+            print_search_results(results)
+            
+        elif mode == "4":
+            # Top Influencers
+            query = input("\n🏆 Enter category/niche (or press Enter for all): ").strip()
+            query = query if query else "top influencers"
+            
+            min_followers = input("Minimum followers (default 100000): ").strip()
+            min_followers = int(min_followers) if min_followers.isdigit() else 100000
+            
+            k = input("Number of results (default 10): ").strip()
+            k = int(k) if k.isdigit() else 10
+            
+            results = find_top_influencers(query=query, min_followers=min_followers, k=k)
+            print_search_results(results)
+            
+        elif mode == "5":
+            # Specific Influencer
+            username = input("\n👤 Enter username (with or without @): ").strip()
+            if not username or username.lower() in ["exit", "quit"]:
+                continue
+            
+            summary = get_influencer_summary(username)
+            
+            if summary:
+                print("\n" + "=" * 80)
+                print(f"📊 Influencer Profile: @{summary['username']}")
+                print("=" * 80)
+                print(f"Name: {summary['name']}")
+                print(f"Followers: {summary['followers']:,}")
+                print(f"Engagement Rate: {summary['engagement_rate']:.2f}%")
+                print(f"Category: {summary['category']}")
+                print(f"Location: {summary['location']}")
+                if summary['top_hashtags']:
+                    hashtags = ", ".join([f"#{tag}" for tag in summary['top_hashtags']])
+                    print(f"Top Hashtags: {hashtags}")
+                print(f"\nBio/Description:\n{summary['content']}")
+                print("=" * 80)
+            else:
+                print(f"\n❌ Influencer '@{username}' not found in database.")
+                
+        elif mode == "6":
+            # Compare Influencers
+            print("\n📊 Enter usernames to compare (comma-separated):")
+            usernames_input = input("Usernames: ").strip()
+            if not usernames_input or usernames_input.lower() in ["exit", "quit"]:
+                continue
+            
+            usernames = [u.strip() for u in usernames_input.split(",")]
+            results = compare_influencers(usernames)
+            
+            if results:
+                print("\n" + "=" * 80)
+                print(f"📊 Comparing {len(results)} Influencer(s)")
+                print("=" * 80)
+                
+                for i, summary in enumerate(results, 1):
+                    print(f"\n{i}. @{summary['username']}")
+                    print(f"   Name: {summary['name']}")
+                    print(f"   Followers: {summary['followers']:,}")
+                    print(f"   Engagement: {summary['engagement_rate']:.2f}%")
+                    print(f"   Category: {summary['category']}")
+                    print(f"   Location: {summary['location']}")
+                    print("-" * 80)
+            else:
+                print("\n❌ No influencers found with those usernames.")
+        
+        else:
+            print("\n❌ Invalid option. Please choose 0-6.")
+
+
 if __name__ == "__main__":
-    print("=" * 80)
-    print("ChromaDB Query Examples - Influencer Search")
-    print("=" * 80)
-    
-    # Example 1: Basic semantic search
-    print("\n1. Basic Search: Fitness Influencers")
-    results = similarity_search("fitness workout gym", k=3)
-    print_search_results(results)
-    
-    # Example 2: Rising stars
-    print("\n2. Finding Rising Stars (High Engagement, 10K-100K followers)")
-    rising = find_rising_stars(query="fashion beauty", min_engagement=3.0, k=3)
-    print_search_results(rising)
-    
-    # Example 3: Top influencers
-    print("\n3. Top Influencers (100K+ followers)")
-    top = find_top_influencers(query="lifestyle", min_followers=100000, k=3)
-    print_search_results(top)
-    
-    # Example 4: RAG with LLM
-    print("\n4. RAG Query with Gemini 2.5 Flash")
-    question = "Who are the best fitness influencers with high engagement?"
-    response = query_chromadb(question, k=3)
-    print(f"\nQuestion: {question}")
-    print(f"\nAnswer: {response['result']}")
-    print(f"\nSources: {len(response['source_documents'])} influencers analyzed")
-    
-    print("\n" + "=" * 80)
+    # Run interactive mode
+    interactive_query()
