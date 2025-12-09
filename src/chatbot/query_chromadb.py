@@ -392,145 +392,271 @@ def print_search_results(results: List[Document], show_metadata: bool = True):
         print("-" * 80)
 
 
-def interactive_query():
+def classify_intent(query: str) -> Dict[str, Any]:
     """
-    Interactive query interface for the chatbot.
-    Allows users to enter custom queries and choose search modes.
-    """
-    print("=" * 80)
-    print("🤖 UpClout Influencer Chatbot - Interactive Mode")
-    print("=" * 80)
-    print("\nWelcome! Ask me anything about influencers in the database.")
-    print("Type 'exit' or 'quit' to end the session.\n")
+    Classify user intent and extract parameters using LLM.
     
-    while True:
-        print("\n" + "-" * 80)
-        print("Choose a search mode:")
-        print("  1. 💬 AI Chat (RAG with Gemini) - Ask natural language questions")
-        print("  2. 🔍 Similarity Search - Find similar influencers")
-        print("  3. ⭐ Rising Stars - High engagement, 10K-100K followers")
-        print("  4. 🏆 Top Influencers - 100K+ followers")
-        print("  5. 👤 Specific Influencer - Look up by username")
-        print("  6. 📊 Compare Influencers - Compare multiple influencers")
-        print("  0. ❌ Exit")
-        print("-" * 80)
+    Args:
+        query: User's natural language query
         
-        mode = input("\nSelect mode (0-6): ").strip()
+    Returns:
+        Dictionary with intent type and extracted parameters
+    """
+    classification_prompt = f"""Analyze this user query and classify the intent. Extract relevant parameters.
+
+User Query: "{query}"
+
+Classify into ONE of these intents:
+1. GENERAL_CHAT - General questions, RAG-based answers
+2. RISING_STARS - Looking for rising influencers (high engagement, 10K-100K followers)
+3. TOP_INFLUENCERS - Looking for top-tier influencers (100K+ followers)
+4. SPECIFIC_LOOKUP - Looking up a specific influencer by username
+5. COMPARE - Comparing multiple influencers
+6. SIMILARITY_SEARCH - Finding similar influencers based on description
+
+Extract these parameters if mentioned:
+- usernames: List of @usernames mentioned
+- category/niche: Business category (fitness, beauty, tech, etc.)
+- min_followers: Minimum follower count
+- max_followers: Maximum follower count
+- min_engagement: Minimum engagement rate percentage
+- num_results: Number of results requested (default 5 for specific queries, 10 for lists)
+- location: Geographic location if mentioned
+
+Respond ONLY with valid JSON in this exact format:
+{{
+    "intent": "INTENT_TYPE",
+    "parameters": {{
+        "usernames": [],
+        "category": "",
+        "min_followers": null,
+        "max_followers": null,
+        "min_engagement": null,
+        "num_results": 5,
+        "location": ""
+    }},
+    "original_query": "the query"
+}}"""
+    
+    try:
+        response = llm.invoke(classification_prompt)
+        # Parse JSON response
+        import json
+        import re
         
-        if mode == "0" or mode.lower() in ["exit", "quit"]:
-            print("\n👋 Thanks for using UpClout Chatbot! Goodbye!")
-            break
+        # Extract JSON from response (in case LLM adds extra text)
+        json_match = re.search(r'\{.*\}', response, re.DOTALL)
+        if json_match:
+            result = json.loads(json_match.group())
+            return result
+        else:
+            # Fallback to general chat
+            return {
+                "intent": "GENERAL_CHAT",
+                "parameters": {"num_results": 5},
+                "original_query": query
+            }
+    except Exception as e:
+        print(f"⚠️ Intent classification error: {e}")
+        return {
+            "intent": "GENERAL_CHAT",
+            "parameters": {"num_results": 5},
+            "original_query": query
+        }
+
+
+def route_query(query: str) -> str:
+    """
+    Route user query to appropriate function based on intent.
+    
+    Args:
+        query: User's natural language query
         
-        elif mode == "1":
-            # AI Chat with RAG
-            query = input("\n💬 Enter your question: ").strip()
-            if not query or query.lower() in ["exit", "quit"]:
-                continue
+    Returns:
+        Formatted response string
+    """
+    # Classify intent
+    classification = classify_intent(query)
+    intent = classification.get("intent", "GENERAL_CHAT")
+    params = classification.get("parameters", {})
+    
+    print(f"\n🤔 Understanding your request... (Intent: {intent})")
+    
+    try:
+        if intent == "SPECIFIC_LOOKUP":
+            # Look up specific influencer
+            usernames = params.get("usernames", [])
+            if not usernames:
+                return "❌ Please specify an influencer username (e.g., @username)"
             
-            k = input("Number of sources to analyze (default 5): ").strip()
-            k = int(k) if k.isdigit() else 5
-            
-            print("\n🤔 Thinking...")
-            response = query_chromadb(query, k=k)
-            
-            print("\n" + "=" * 80)
-            print(f"🤖 Answer:\n{response['result']}")
-            print("\n" + "=" * 80)
-            print(f"📚 Analyzed {len(response['source_documents'])} influencer(s)")
-            
-        elif mode == "2":
-            # Similarity Search
-            query = input("\n🔍 Enter search query: ").strip()
-            if not query or query.lower() in ["exit", "quit"]:
-                continue
-            
-            k = input("Number of results (default 5): ").strip()
-            k = int(k) if k.isdigit() else 5
-            
-            results = similarity_search(query, k=k)
-            print_search_results(results)
-            
-        elif mode == "3":
-            # Rising Stars
-            query = input("\n⭐ Enter category/niche (or press Enter for all): ").strip()
-            query = query if query else "rising influencers"
-            
-            min_eng = input("Minimum engagement rate % (default 3.0): ").strip()
-            min_eng = float(min_eng) if min_eng else 3.0
-            
-            k = input("Number of results (default 10): ").strip()
-            k = int(k) if k.isdigit() else 10
-            
-            results = find_rising_stars(query=query, min_engagement=min_eng, k=k)
-            print_search_results(results)
-            
-        elif mode == "4":
-            # Top Influencers
-            query = input("\n🏆 Enter category/niche (or press Enter for all): ").strip()
-            query = query if query else "top influencers"
-            
-            min_followers = input("Minimum followers (default 100000): ").strip()
-            min_followers = int(min_followers) if min_followers.isdigit() else 100000
-            
-            k = input("Number of results (default 10): ").strip()
-            k = int(k) if k.isdigit() else 10
-            
-            results = find_top_influencers(query=query, min_followers=min_followers, k=k)
-            print_search_results(results)
-            
-        elif mode == "5":
-            # Specific Influencer
-            username = input("\n👤 Enter username (with or without @): ").strip()
-            if not username or username.lower() in ["exit", "quit"]:
-                continue
-            
+            username = usernames[0]
             summary = get_influencer_summary(username)
             
             if summary:
-                print("\n" + "=" * 80)
-                print(f"📊 Influencer Profile: @{summary['username']}")
-                print("=" * 80)
-                print(f"Name: {summary['name']}")
-                print(f"Followers: {summary['followers']:,}")
-                print(f"Engagement Rate: {summary['engagement_rate']:.2f}%")
-                print(f"Category: {summary['category']}")
-                print(f"Location: {summary['location']}")
+                response = f"\n{'=' * 80}\n"
+                response += f"📊 Influencer Profile: @{summary['username']}\n"
+                response += f"{'=' * 80}\n"
+                response += f"Name: {summary['name']}\n"
+                response += f"Followers: {summary['followers']:,}\n"
+                response += f"Engagement Rate: {summary['engagement_rate']:.2f}%\n"
+                response += f"Category: {summary['category']}\n"
+                response += f"Location: {summary['location']}\n"
                 if summary['top_hashtags']:
                     hashtags = ", ".join([f"#{tag}" for tag in summary['top_hashtags']])
-                    print(f"Top Hashtags: {hashtags}")
-                print(f"\nBio/Description:\n{summary['content']}")
-                print("=" * 80)
+                    response += f"Top Hashtags: {hashtags}\n"
+                response += f"\nBio/Description:\n{summary['content']}\n"
+                response += f"{'=' * 80}"
+                return response
             else:
-                print(f"\n❌ Influencer '@{username}' not found in database.")
-                
-        elif mode == "6":
-            # Compare Influencers
-            print("\n📊 Enter usernames to compare (comma-separated):")
-            usernames_input = input("Usernames: ").strip()
-            if not usernames_input or usernames_input.lower() in ["exit", "quit"]:
-                continue
+                return f"❌ Influencer '@{username}' not found in database."
+        
+        elif intent == "COMPARE":
+            # Compare multiple influencers
+            usernames = params.get("usernames", [])
+            if len(usernames) < 2:
+                return "❌ Please specify at least 2 usernames to compare (e.g., 'compare @user1 and @user2')"
             
-            usernames = [u.strip() for u in usernames_input.split(",")]
             results = compare_influencers(usernames)
             
             if results:
-                print("\n" + "=" * 80)
-                print(f"📊 Comparing {len(results)} Influencer(s)")
-                print("=" * 80)
+                response = f"\n{'=' * 80}\n"
+                response += f"📊 Comparing {len(results)} Influencer(s)\n"
+                response += f"{'=' * 80}\n"
                 
                 for i, summary in enumerate(results, 1):
-                    print(f"\n{i}. @{summary['username']}")
-                    print(f"   Name: {summary['name']}")
-                    print(f"   Followers: {summary['followers']:,}")
-                    print(f"   Engagement: {summary['engagement_rate']:.2f}%")
-                    print(f"   Category: {summary['category']}")
-                    print(f"   Location: {summary['location']}")
-                    print("-" * 80)
+                    response += f"\n{i}. @{summary['username']}\n"
+                    response += f"   Name: {summary['name']}\n"
+                    response += f"   Followers: {summary['followers']:,}\n"
+                    response += f"   Engagement: {summary['engagement_rate']:.2f}%\n"
+                    response += f"   Category: {summary['category']}\n"
+                    response += f"   Location: {summary['location']}\n"
+                    response += f"{'-' * 80}\n"
+                return response
             else:
-                print("\n❌ No influencers found with those usernames.")
+                return "❌ No influencers found with those usernames."
         
-        else:
-            print("\n❌ Invalid option. Please choose 0-6.")
+        elif intent == "RISING_STARS":
+            # Find rising stars
+            category = params.get("category", "rising influencers")
+            min_engagement = params.get("min_engagement", 3.0)
+            num_results = params.get("num_results", 10)
+            
+            query_text = f"{category} rising influencers" if category else "rising influencers"
+            results = find_rising_stars(query=query_text, min_engagement=min_engagement, k=num_results)
+            
+            if results:
+                response = f"\n{'=' * 80}\n"
+                response += f"⭐ Found {len(results)} Rising Star Influencers\n"
+                response += f"{'=' * 80}\n"
+                for i, doc in enumerate(results, 1):
+                    response += f"\n{i}. @{doc.metadata.get('username', 'Unknown')}\n"
+                    response += f"   Name: {doc.metadata.get('name', 'N/A')}\n"
+                    response += f"   Followers: {doc.metadata.get('followers', 0):,}\n"
+                    response += f"   Engagement: {doc.metadata.get('engagement_rate', 0):.2f}%\n"
+                    response += f"   Category: {doc.metadata.get('category', 'N/A')}\n"
+                    response += f"{'-' * 80}\n"
+                return response
+            else:
+                return "❌ No rising stars found matching your criteria."
+        
+        elif intent == "TOP_INFLUENCERS":
+            # Find top influencers
+            category = params.get("category", "top influencers")
+            min_followers = params.get("min_followers", 100000)
+            num_results = params.get("num_results", 10)
+            
+            query_text = f"{category} top influencers" if category else "top influencers"
+            results = find_top_influencers(query=query_text, min_followers=min_followers, k=num_results)
+            
+            if results:
+                response = f"\n{'=' * 80}\n"
+                response += f"🏆 Found {len(results)} Top Influencers\n"
+                response += f"{'=' * 80}\n"
+                for i, doc in enumerate(results, 1):
+                    response += f"\n{i}. @{doc.metadata.get('username', 'Unknown')}\n"
+                    response += f"   Name: {doc.metadata.get('name', 'N/A')}\n"
+                    response += f"   Followers: {doc.metadata.get('followers', 0):,}\n"
+                    response += f"   Engagement: {doc.metadata.get('engagement_rate', 0):.2f}%\n"
+                    response += f"   Category: {doc.metadata.get('category', 'N/A')}\n"
+                    response += f"{'-' * 80}\n"
+                return response
+            else:
+                return "❌ No top influencers found matching your criteria."
+        
+        elif intent == "SIMILARITY_SEARCH":
+            # Similarity search
+            num_results = params.get("num_results", 5)
+            results = similarity_search(query, k=num_results)
+            
+            if results:
+                response = f"\n{'=' * 80}\n"
+                response += f"🔍 Found {len(results)} Similar Influencers\n"
+                response += f"{'=' * 80}\n"
+                for i, doc in enumerate(results, 1):
+                    response += f"\n{i}. @{doc.metadata.get('username', 'Unknown')}\n"
+                    response += f"   Name: {doc.metadata.get('name', 'N/A')}\n"
+                    response += f"   Followers: {doc.metadata.get('followers', 0):,}\n"
+                    response += f"   Engagement: {doc.metadata.get('engagement_rate', 0):.2f}%\n"
+                    response += f"   Category: {doc.metadata.get('category', 'N/A')}\n"
+                    response += f"{'-' * 80}\n"
+                return response
+            else:
+                return "❌ No similar influencers found."
+        
+        else:  # GENERAL_CHAT
+            # Use RAG with Gemini
+            num_results = params.get("num_results", 5)
+            rag_response = query_chromadb(query, k=num_results)
+            
+            response = f"\n{'=' * 80}\n"
+            response += f"🤖 Owly's Answer:\n\n{rag_response['result']}\n"
+            response += f"\n{'=' * 80}\n"
+            response += f"� Analyzed {len(rag_response['source_documents'])} influencer profile(s)\n"
+            return response
+            
+    except Exception as e:
+        return f"❌ Error processing query: {str(e)}"
+
+
+def interactive_query():
+    """
+    Conversational chatbot interface with intelligent intent detection.
+    No menus - just natural conversation!
+    """
+    print("=" * 80)
+    print("🤖 UpClout Influencer Chatbot - Conversational Mode")
+    print("=" * 80)
+    print("\nHi! I'm Owly, your UpClout assistant. Ask me anything about influencers!")
+    print("\nExamples:")
+    print("  • 'Show me rising stars in fitness'")
+    print("  • 'Who are the top tech influencers?'")
+    print("  • 'Tell me about @username'")
+    print("  • 'Compare @user1 and @user2'")
+    print("  • 'Find influencers with high engagement in beauty'")
+    print("\nType 'exit' or 'quit' to end the session.\n")
+    
+    conversation_history = []
+    
+    while True:
+        # Get user input
+        user_input = input("\n💬 You: ").strip()
+        
+        # Check for exit
+        if not user_input or user_input.lower() in ["exit", "quit", "bye", "goodbye"]:
+            print("\n👋 Thanks for chatting! Goodbye!")
+            break
+        
+        # Add to conversation history
+        conversation_history.append({"role": "user", "content": user_input})
+        
+        # Route query and get response
+        response = route_query(user_input)
+        
+        # Display response
+        print(f"\n{response}")
+        
+        # Add to conversation history
+        conversation_history.append({"role": "assistant", "content": response})
 
 
 if __name__ == "__main__":

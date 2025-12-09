@@ -4,7 +4,6 @@ from langchain_core.messages import HumanMessage, AIMessage
 import uuid
 # file imports
 from config.vertex_config import vector_store, instruction, llm
-from config.mongo_db import save_message
 
 def call_model(state: MessagesState):
     user_input = state['messages'][-1].content
@@ -73,9 +72,6 @@ def run_model():
         user_msg = HumanMessage(content=user)
         state["messages"].append(user_msg)
 
-        # SAVE USER MESSAGE TO DB
-        save_message(THREAD_ID, {"role": "user", "content": user_msg.content})
-
         # Generate response
         state = app.invoke(state, config)
 
@@ -85,8 +81,6 @@ def run_model():
 
         # SAVE ASSISTANT MESSAGE TO DB
         ai_msg = state["messages"][-1]   # last message is always AI
-        save_message(THREAD_ID, {"role": "assistant", "content": ai_msg.content})
-
 
 if __name__=="__main__":
     run_model()
