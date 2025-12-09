@@ -5,3 +5,4 @@ __pycache__
 temp_data
 logs
 src/apify.py
+src/chatbot/chroma_db

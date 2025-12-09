@@ -1,7 +1,7 @@
 import psycopg2
 import os
 import pandas as pd
-import log
+from src.etl import log
 
 class Postgres:
     def __init__(self):
@@ -27,6 +27,20 @@ class Postgres:
         self.conn.commit()
         self.cur.close()
         self.conn.close()
+
+    def execute(self, query: str, params: tuple = None):
+        """Execute a SELECT query and return results as list of dictionaries."""
+        self.cur.execute(query, params)
+        results = self.cur.fetchall()
+        
+        if not results:
+            return []
+        
+        # Get column names from cursor description
+        columns = [desc[0] for desc in self.cur.description]
+        
+        # Convert to list of dictionaries
+        return [dict(zip(columns, row)) for row in results]
 
     # -- Storage Functions -- #
 

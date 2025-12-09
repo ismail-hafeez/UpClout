@@ -15,3 +15,7 @@ google-genai
 pymongo[srv]
 langchain
 langgraph
+langchain_chroma
+chromadb
+langchain-text-splitters
+langchain-community
