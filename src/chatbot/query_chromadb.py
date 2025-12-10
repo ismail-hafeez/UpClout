@@ -420,7 +420,7 @@ Extract these parameters if mentioned:
 - min_followers: Minimum follower count
 - max_followers: Maximum follower count
 - min_engagement: Minimum engagement rate percentage
-- num_results: Number of results requested (default 5 for specific queries, 10 for lists)
+- num_results: Number of results requested (default 5 for specific queries. IF "list" or "all" is mentioned, set to 20 or higher. Max 50.)
 - location: Geographic location if mentioned
 
 Respond ONLY with valid JSON in this exact format:
