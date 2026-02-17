@@ -81,6 +81,7 @@ def run_model():
 
         # SAVE ASSISTANT MESSAGE TO DB
         ai_msg = state["messages"][-1]   # last message is always AI
+        #print(ai_msg)
 
 if __name__=="__main__":
     run_model()

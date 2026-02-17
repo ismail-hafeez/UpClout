@@ -23,8 +23,6 @@ PROCESSED_LOG_PATH = "processed_ids.txt"
 CHUNK_SIZE = 1000  # Reduced to stay within 20K token limit
 CHUNK_OVERLAP = 100
 BATCH_SIZE = 50  # ChromaDB works well with smaller batches
-# MAX_RECENT_POSTS removed - now using ALL posts per influencer/brand
-
 
 def load_processed_ids(log_path: str = PROCESSED_LOG_PATH) -> set:
     """Load previously processed influencer IDs to avoid duplicates."""

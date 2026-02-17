@@ -4,5 +4,7 @@ data/
 __pycache__
 temp_data
 logs
-src/apify.py
 src/chatbot/chroma_db
+src/chatbot/processed_influencer_ids.txt
+src/chatbot/processed_brand_ids.txt
+chroma_db

@@ -19,3 +19,6 @@ langchain_chroma
 chromadb
 langchain-text-splitters
 langchain-community
+fastapi
+streamlit
+uvicorn 
