@@ -1,3 +1,3 @@
-select *
-from influencers
-where location = 'islamabad';
+DELETE FROM influencers WHERE username = 'alymaliha';
+
+select * from influencers where username = 'alymaliha';

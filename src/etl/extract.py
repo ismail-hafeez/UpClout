@@ -9,7 +9,7 @@ def scrape_influencer(username: str, apify: Apify) -> int | str:
     time.sleep(2)
     apify.scrape_post_data(username)
 
-    return f"../data/{username}"
+    return f"../../data/{username}"
 
 def scrape_brand(username: str, apify: Apify) -> int | str:
 
@@ -19,7 +19,7 @@ def scrape_brand(username: str, apify: Apify) -> int | str:
     time.sleep(2)
     apify.scrape_post_data(username)
 
-    return f"../data/{username}"
+    return f"../../data/{username}"
 
 if __name__=="__main__":
     pass

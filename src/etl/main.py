@@ -17,17 +17,17 @@ def delete_folder(path: str) -> None:
 
 def get_influencer_list() -> list[str]:
 
-    with open("../insta_profiles.txt", "r") as file:
+    with open("../../insta_profiles.txt", "r") as file:
         influencers = [line.strip() for line in file.readlines()]
 
     return influencers
 
 def already_processed(username: str) -> bool:
-    with open("../processed_influencers.txt", "r") as f:
+    with open("../../processed_influencers.txt", "r") as f:
         return username in {line.strip() for line in f}
 
 def keep_track_influencers(influencer: str) -> None:
-    with open("../processed_influencers.txt", "a") as f:
+    with open("../../processed_influencers.txt", "a") as f:
         f.write(f"{influencer}\n")
 
 def get_post_data_dict(path: str) -> dict:
@@ -42,7 +42,7 @@ def get_post_data_dict(path: str) -> dict:
     return data[0]
 
 def isPrivate(response: any, username: str) -> bool:   
-    path: str = f"../data/{username}"
+    path: str = f"../../data/{username}"
          
     if response == 0:
         delete_folder(path)
@@ -71,6 +71,8 @@ def ETL():
         if already_processed(influencer):
             continue
 
+        influencer='alymaliha'
+
         # Switch APIs every 5 scrapes
         if count % 4 == 0:
             print("Rotating APIs")
@@ -92,8 +94,8 @@ def ETL():
             continue
 
         # Skipping if private 
-        if isPrivate(path, influencer):
-            continue        
+        #if isPrivate(path, influencer):
+            #continue        
 
         influencerID = meta_data.clean_meta_data(path) # Transform I
         postgres.load_influencer_table(path) # Load
@@ -102,6 +104,8 @@ def ETL():
         # dump in txt file
         keep_track_influencers(influencer)  
         count+=1
+
+        break
 
     postgres.close_connection()
 

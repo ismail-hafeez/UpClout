@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 
-LOG_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'logs'))
+LOG_DIR = '../../logs'
 
 # -- create_database.py -- #
 def log_db_donfig(message: str) -> None:

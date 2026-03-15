@@ -1,7 +1,7 @@
 import psycopg2
 import os
 import pandas as pd
-from src.etl import log
+import log
 
 class Postgres:
     def __init__(self):
@@ -159,7 +159,7 @@ class Postgres:
                     likesCount,
                     timestamp,
                     isSponsored,
-                    ownerid,
+                    ownerid
                 )
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (postID) DO NOTHING;
