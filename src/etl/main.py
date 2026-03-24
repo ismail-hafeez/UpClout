@@ -71,8 +71,6 @@ def ETL():
         if already_processed(influencer):
             continue
 
-        influencer='alymaliha'
-
         # Switch APIs every 5 scrapes
         if count % 4 == 0:
             print("Rotating APIs")
@@ -89,13 +87,14 @@ def ETL():
         # Extract
         try:
             path = extract.scrape_influencer(influencer, apify) # Extract
+            count+=1
         except Exception as e:
             log.log_skipped_influencer(f"{influencer}Extract failed — {e}")
             continue
 
         # Skipping if private 
-        #if isPrivate(path, influencer):
-            #continue        
+        if isPrivate(path, influencer):
+            continue        
 
         influencerID = meta_data.clean_meta_data(path) # Transform I
         postgres.load_influencer_table(path) # Load
@@ -103,9 +102,8 @@ def ETL():
 
         # dump in txt file
         keep_track_influencers(influencer)  
-        count+=1
 
-        break
+        # break
 
     postgres.close_connection()
 
