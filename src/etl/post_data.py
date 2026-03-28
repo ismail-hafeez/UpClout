@@ -68,10 +68,8 @@ def correct_dtypes_post(_dict: dict) -> dict:
 
     return _dict
 
-def handle_taggedUsers(postID: int, taggedUsers: list) -> None:
+def handle_taggedUsers(postID: int, taggedUsers: list, postgres: Postgres) -> None:
     
-    postgres = Postgres()
-
     for user_dict in taggedUsers:
         id = int(user_dict.get("id"))
         username = user_dict.get("username")
@@ -79,8 +77,6 @@ def handle_taggedUsers(postID: int, taggedUsers: list) -> None:
         postgres.load_taggedUsers(id, username)
         # Storing in Posts_taggeduser table (N:M)
         postgres.load_posts_taggedUsers(postID, id)
-
-    postgres.close_connection()
 
 def mention_exists(username: str) -> bool:
     conn = psycopg2.connect(database="postgres", user="postgres", password=1040)
@@ -186,7 +182,7 @@ def clean_post_data(current_folder: str, influencerID: int) -> None:
         #handle_mentions(_dict['id'], _dict['mentions'])
 
         if "taggedUsers" in _dict:
-            handle_taggedUsers(_dict["id"], _dict["taggedUsers"])
+            handle_taggedUsers(_dict["id"], _dict["taggedUsers"], postgres)
 
         if "coauthorProducers" in _dict:
             handle_coauthors(_dict['id'], _dict['coauthorProducers'])
