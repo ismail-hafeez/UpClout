@@ -1,0 +1,211 @@
+.up-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: upFadeIn 0.2s ease;
+}
+
+@keyframes upFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.up-modal-card {
+  width: 92%;
+  max-width: 900px;
+  height: 85vh;
+  max-height: 900px;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: 24px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+  overflow: hidden;
+  animation: upSlideUp 0.3s cubic-bezier(0.23,1,0.32,1);
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes upSlideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.up-header {
+  padding: 2.5rem 3rem;
+  border-bottom: 1px solid var(--clr-border);
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  position: relative;
+  background: linear-gradient(180deg, var(--clr-surface-2) 0%, var(--clr-surface) 100%);
+}
+
+.up-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--clr-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-text-muted);
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.15s;
+}
+.up-close:hover { 
+  background: var(--clr-border); 
+  color: var(--clr-text-primary); 
+}
+
+.up-avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--clr-border);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.up-info {
+  flex: 1;
+}
+
+.up-info h2 {
+  font-size: 1.8rem;
+  margin: 0;
+  color: var(--clr-text-primary);
+  font-weight: 700;
+}
+.up-info p {
+  margin: 0.2rem 0 0.6rem;
+  color: var(--clr-text-muted);
+  font-size: 0.95rem;
+}
+
+.up-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--clr-text-secondary);
+}
+
+.up-body {
+  padding: 2.5rem 3rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.up-section-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 1.2rem;
+  color: var(--clr-text-primary);
+}
+
+.up-review-card {
+  background: var(--clr-surface-2);
+  border: 1px solid var(--clr-border);
+  border-radius: 14px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  transition: transform 0.15s;
+}
+.up-review-card:hover {
+  transform: translateY(-2px);
+}
+
+.up-review-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.up-review-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.up-review-author {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--clr-text-primary);
+  flex: 1;
+}
+
+.up-review-date {
+  font-size: 0.8rem;
+  color: var(--clr-text-muted);
+}
+
+.up-review-comment {
+  font-size: 0.95rem;
+  color: var(--clr-text-secondary);
+  line-height: 1.5;
+  margin-top: 0.5rem;
+}
+
+.up-leave-review {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--clr-border);
+}
+
+.up-textarea {
+  width: 100%;
+  background: var(--clr-surface);
+  border: 1.5px solid var(--clr-border);
+  border-radius: 12px;
+  padding: 1rem;
+  font-size: 0.95rem;
+  color: var(--clr-text-primary);
+  resize: vertical;
+  min-height: 90px;
+  margin-top: 0.8rem;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.up-textarea:focus {
+  border-color: var(--clr-primary-light);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.up-submit-btn {
+  margin-top: 1.2rem;
+  width: 100%;
+  padding: 0.85rem;
+  background: linear-gradient(135deg, var(--clr-primary-light), var(--clr-accent));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.up-submit-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+}
+
+.up-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

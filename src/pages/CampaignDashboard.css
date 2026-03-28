@@ -1,0 +1,168 @@
+.campaign-dash {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  color: var(--clr-text-primary);
+  font-family: inherit;
+}
+.cd-back-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: transparent; border: 1px solid var(--clr-border); border-radius: 20px; padding: 0.5rem 1.25rem; color: var(--clr-text-muted); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 2rem; }
+.cd-back-btn .icon { font-size: 1.1rem; vertical-align: middle; }
+.cd-back-btn:hover { background: var(--clr-surface-2); border-color: var(--clr-primary); color: var(--clr-primary); transform: translateX(-4px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+.cd-back-btn:active { transform: translateX(-2px) scale(0.98); }
+.campaign-dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+.campaign-dash-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+.campaign-tabs {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--clr-border);
+}
+.campaign-tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.8rem 0;
+  color: var(--clr-text-muted);
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.campaign-tab-btn:hover {
+  color: var(--clr-text-primary);
+}
+.campaign-tab-btn.active {
+  color: var(--clr-primary);
+  border-bottom-color: var(--clr-primary);
+}
+.btn-primary {
+  background: var(--clr-primary);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+.btn-primary:hover {
+  opacity: 0.9;
+}
+.campaign-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+.campaign-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.campaign-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.campaign-card h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+}
+.campaign-card p {
+  color: var(--clr-text-muted);
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+}
+.campaign-status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: var(--clr-surface-2);
+}
+.campaign-status.active {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: var(--clr-bg);
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+}
+.form-group {
+  margin-bottom: 1rem;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--clr-border);
+  border-radius: 8px;
+  background: var(--clr-surface);
+  color: var(--clr-text-primary);
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--clr-text-primary);
+  border: 1px solid var(--clr-border);
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.campaign-card-financials {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--clr-border);
+}
+.campaign-card-budget-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+.campaign-card-budget-row .spent { font-weight: 700; color: var(--clr-text-primary); }
+.campaign-card-budget-row .total { color: var(--clr-text-muted); }
+.mini-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--clr-surface-2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.mini-progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
