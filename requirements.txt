@@ -22,3 +22,4 @@ langchain-community
 fastapi
 streamlit
 uvicorn 
+boto3
