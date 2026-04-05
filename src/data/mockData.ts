@@ -89,20 +89,7 @@ export const mockOwlyMessages: Message[] = [
   {
     id: "1",
     sender: "owly",
-    text: "Hi! I'm Owly, your AI assistant. Tell me about your campaign and I'll find the perfect influencers for you!",
-    timestamp: "10:00 AM",
-  },
-  {
-    id: "2",
-    sender: "me",
-    text: "I need fitness influencers in the US with 50k-200k followers who focus on sustainable living.",
-    timestamp: "10:01 AM",
-    avatar: AVATARS.me,
-  },
-  {
-    id: "3",
-    sender: "owly",
-    text: "Great brief! I found 24 matching influencers. Top picks include @greenfit.life (142k followers, 4.8% engagement), @sustainablesweats (89k, 5.2%), and @earthmovements (67k, 6.1%). Want me to reach out to any of them on your behalf?",
-    timestamp: "10:01 AM",
+    text: "Hoot! I'm Owly, your AI talent scout. I've analyzed thousands of profiles to find your perfect match. Who are we looking for today?",
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   },
 ];

@@ -145,6 +145,7 @@
   font-size: 0.93rem;
   color: var(--clr-text-primary);
   line-height: 1.55;
+  white-space: pre-line;
 }
 
 .message-time {

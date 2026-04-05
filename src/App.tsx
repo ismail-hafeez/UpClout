@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import './styles/globals.css';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import MainPage from './pages/MainPage';
 import OwlyIntro from './pages/OwlyIntro';
 import OwlyChat from './pages/OwlyChat';
 import UserChat from './pages/UserChat';
+import ProfilePage from './pages/ProfilePage';
 import CampaignDashboard from './pages/CampaignDashboard';
 import CampaignDetails from './pages/CampaignDetails';
 import { getToken, apiMe, setCurrentUser, clearToken, clearCurrentUser, apiGetConversations } from './services/api';
 import { connectSocket, disconnectSocket, getSocket } from './services/socket';
 
-type AppPage = 'login' | 'main' | 'owly-intro' | 'owly-chat' | 'user-chat' | 'campaign-dashboard' | 'campaign-details';
+type AppPage = 'landing' | 'login' | 'main' | 'owly-intro' | 'owly-chat' | 'user-chat' | 'campaign-dashboard' | 'campaign-details' | 'profile';
 
 const App: React.FC = () => {
-  const [page, setPage] = useState<AppPage>('login');
+  const [page, setPage] = useState<AppPage>('landing');
   const [currentCampaignId, setCurrentCampaignId] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
+  const [targetUsername, setTargetUsername] = useState<string | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
   });
@@ -93,7 +96,7 @@ const App: React.FC = () => {
     clearToken();
     clearCurrentUser();
     setTotalUnread(0);
-    setPage('login');
+    setPage('landing');
   };
 
   const handleNavigate = (target: string, params?: any) => {
@@ -107,12 +110,18 @@ const App: React.FC = () => {
       setCurrentCampaignId(params?.campaignId || null);
       setPage('campaign-details');
     }
+    else if (target === 'profile') {
+      setTargetUsername(params?.username || null);
+      setPage('profile');
+    }
     else if (target === 'main') setPage('main');
   };
 
   if (!authChecked) return null; // Avoid flash before token check
 
   switch (page) {
+    case 'landing':
+      return <LandingPage onTryNow={() => setPage('login')} />;
     case 'login':
       return <LoginPage onLogin={handleLogin} />;
     case 'owly-intro':
@@ -125,6 +134,8 @@ const App: React.FC = () => {
       return <CampaignDashboard onNavigate={handleNavigate} onBack={() => setPage('main')} />;
     case 'campaign-details':
       return <CampaignDetails campaignId={currentCampaignId!} onNavigate={handleNavigate} onBack={() => setPage('campaign-dashboard')} />;
+    case 'profile':
+      return <ProfilePage username={targetUsername!} onBack={() => setPage('main')} />;
     case 'main':
     default:
       return <MainPage onNavigate={handleNavigate as any} onBack={handleLogout} unreadCount={totalUnread} theme={theme} onToggleTheme={handleToggleTheme} />;

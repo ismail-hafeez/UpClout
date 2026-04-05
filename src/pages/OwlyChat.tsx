@@ -11,13 +11,14 @@ const OwlyChat: React.FC<OwlyChatProps> = ({ onBack }) => {
   const [messages, setMessages] = useState<Message[]>(mockOwlyMessages);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [threadId, setThreadId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const text = input.trim();
     if (!text) return;
 
@@ -33,23 +34,83 @@ const OwlyChat: React.FC<OwlyChatProps> = ({ onBack }) => {
     setInput('');
     setIsTyping(true);
 
-    // Simulate Owly response
-    setTimeout(() => {
+    try {
+      // 1. Prepare history for the backend
+      const history = messages
+        .filter(m => m.id !== "1") // Skip the welcome message for model context if you prefer
+        .map(m => ({
+          role: m.sender === 'me' ? 'user' : 'bot',
+          content: m.text
+        }));
+
+      // 2. Call our unified FastAPI backend
+      const response = await fetch('http://localhost:5000/api/owly/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: text,
+          history: history,
+          thread_id: threadId
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to connect to Owly');
+
+      // 3. Handle thread_id from headers
+      const newThreadId = response.headers.get('X-Thread-ID');
+      if (newThreadId) setThreadId(newThreadId);
+
       setIsTyping(false);
-      const responses = [
-        "Great! Based on your requirements, I found 18 perfect matches. The top influencer is @wellness.wanderer with 120k followers and an exceptional 6.4% engagement rate. Want me to show you more details?",
-        "I'm analyzing your campaign goals... I recommend micro-influencers in the 10k-50k range for maximum ROI. They typically deliver 3-5x higher engagement than mega-influencers. Want me to curate a shortlist?",
-        "On it! I'm scanning through 50,000+ influencer profiles right now. Give me a moment to filter by niche, location, and audience demographics...",
-        "I found some fantastic options! Average cost per post is $450 for your target range. Shall I draft outreach messages for the top 5 picks?",
-      ];
-      const owlyMsg: Message = {
-        id: (Date.now() + 1).toString(),
+
+      // 4. Handle Streaming Response
+      const reader = response.body?.getReader();
+      if (!reader) return;
+
+      const decoder = new TextDecoder();
+      const owlyMsgId = (Date.now() + 1).toString();
+      
+      // Initialize an empty message from Owly
+      const initialOwlyMsg: Message = {
+        id: owlyMsgId,
         sender: 'owly',
-        text: responses[Math.floor(Math.random() * responses.length)],
+        text: '',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
-      setMessages(prev => [...prev, owlyMsg]);
-    }, 1800);
+      
+      setMessages(prev => [...prev, initialOwlyMsg]);
+
+      let fullText = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        fullText += chunk;
+
+        // Update the last message (the Owly one we just added) with the new text
+        setMessages(prev => {
+          const updated = [...prev];
+          const lastIdx = updated.length - 1;
+          if (updated[lastIdx].id === owlyMsgId) {
+            updated[lastIdx] = { ...updated[lastIdx], text: fullText };
+          }
+          return updated;
+        });
+      }
+
+    } catch (error) {
+      console.error('Owly Error:', error);
+      setIsTyping(false);
+      const errorMsg: Message = {
+        id: 'error-' + Date.now(),
+        sender: 'owly',
+        text: "Hoot! I'm having trouble connecting to my database right now. Please make sure the UpClout backend is running.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages(prev => [...prev, errorMsg]);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

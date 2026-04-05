@@ -52,6 +52,10 @@ export const apiLogin = (body: { username: string; password: string }) =>
   request('/auth/login', { method: 'POST', body: JSON.stringify(body) });
 
 export const apiMe = () => request('/auth/me');
+export const apiGetBrandStats = () => request('/auth/brand-stats');
+export const apiGetBrandRecommendations = () => request('/auth/recommendations');
+export const apiGetAnalytics = (username: string) => request(`/analytics/${username}`);
+export const apiGetProfileDetails = (username: string) => request(`/profiles/${username}`);
 
 // Conversations
 export const apiGetConversations = () => request('/conversations');
@@ -77,7 +81,7 @@ export const apiUploadFile = (conversationId: string, file: File) => {
 };
 
 export const apiSearchUsers = (q: string) =>
-  request(`/conversations/users/search?q=${encodeURIComponent(q)}`);
+  request(`/auth/search-pg?q=${encodeURIComponent(q)}`);
 
 export const apiUpdateProfile = (body: { displayName?: string; avatarUrl?: string }) =>
   request('/auth/profile', { method: 'PATCH', body: JSON.stringify(body) });
