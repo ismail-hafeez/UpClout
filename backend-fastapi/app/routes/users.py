@@ -24,8 +24,13 @@ async def get_connection_requests(user: dict = Depends(get_current_user)):
     for req in requests:
         requester = await db.users.find_one(
             {"_id": req["requester"]},
-            {"username": 1, "displayName": 1, "avatarUrl": 1, "cloutScore": 1},
+            {"username": 1, "displayName": 1, "avatarUrl": 1, "cloutScore": 1, "userType": 1},
         )
+        if requester:
+            from app.auth import get_pg_profile_pic
+            pg_pic = get_pg_profile_pic(requester.get("username", ""), requester.get("userType", "Influencer"))
+            if pg_pic:
+                requester["avatarUrl"] = pg_pic
         result.append({
             "_id": str(req["_id"]),
             "requester": {
@@ -61,8 +66,13 @@ async def get_accepted_connections(user: dict = Depends(get_current_user)):
         other_id = conn["recipient"] if conn["requester"] == user_id else conn["requester"]
         other = await db.users.find_one(
             {"_id": other_id},
-            {"username": 1, "displayName": 1, "avatarUrl": 1, "cloutScore": 1},
+            {"username": 1, "displayName": 1, "avatarUrl": 1, "cloutScore": 1, "userType": 1},
         )
+        if other:
+            from app.auth import get_pg_profile_pic
+            pg_pic = get_pg_profile_pic(other.get("username", ""), other.get("userType", "Influencer"))
+            if pg_pic:
+                other["avatarUrl"] = pg_pic
         if other:
             friends.append({
                 "_id": str(other["_id"]),
@@ -201,8 +211,13 @@ async def get_user_profile(user_id: str):
     try:
         user = await db.users.find_one(
             {"_id": ObjectId(user_id)},
-            {"_id": 1, "username": 1, "displayName": 1, "avatarUrl": 1, "cloutScore": 1, "reviewCount": 1, "createdAt": 1},
+            {"_id": 1, "username": 1, "displayName": 1, "avatarUrl": 1, "cloutScore": 1, "reviewCount": 1, "createdAt": 1, "userType": 1},
         )
+        if user:
+            from app.auth import get_pg_profile_pic
+            pg_pic = get_pg_profile_pic(user.get("username", ""), user.get("userType", "Influencer"))
+            if pg_pic:
+                user["avatarUrl"] = pg_pic
     except Exception:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -235,8 +250,13 @@ async def get_reviews(
     for rev in reviews:
         reviewer = await db.users.find_one(
             {"_id": rev["reviewer"]},
-            {"username": 1, "displayName": 1, "avatarUrl": 1},
+            {"username": 1, "displayName": 1, "avatarUrl": 1, "userType": 1},
         )
+        if reviewer:
+            from app.auth import get_pg_profile_pic
+            pg_pic = get_pg_profile_pic(reviewer.get("username", ""), reviewer.get("userType", "Influencer"))
+            if pg_pic:
+                reviewer["avatarUrl"] = pg_pic
         result.append({
             "_id": str(rev["_id"]),
             "reviewer": {

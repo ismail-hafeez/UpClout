@@ -126,24 +126,24 @@ async def message_send(sid, data):
         print("SOCKET MESSAGE ERROR: Conversation not found or you are not a participant")
         return {"error": "Conversation not found"}
 
-    # Check connection
-    other_participant_id = None
-    for p in conversation.get("participants", []):
-        if str(p) != user_id_str:
-            other_participant_id = p
-            break
+    # Connection check removed (unrestricted messaging enabled)
+    # other_participant_id = None
+    # for p in conversation.get("participants", []):
+    #     if str(p) != user_id_str:
+    #         other_participant_id = p
+    #         break
 
-    if other_participant_id:
-        conn = await db.connections.find_one({
-            "$or": [
-                {"requester": user_id, "recipient": other_participant_id},
-                {"requester": other_participant_id, "recipient": user_id},
-            ],
-            "status": "accepted",
-        })
-        if not conn:
-            print("SOCKET MESSAGE ERROR: Users are not connected")
-            return {"error": "not_connected"}
+    # if other_participant_id:
+    #     conn = await db.connections.find_one({
+    #         "$or": [
+    #             {"requester": user_id, "recipient": other_participant_id},
+    #             {"requester": other_participant_id, "recipient": user_id},
+    #         ],
+    #         "status": "accepted",
+    #     })
+    #     if not conn:
+    #         print("SOCKET MESSAGE ERROR: Users are not connected")
+    #         return {"error": "not_connected"}
 
     # Save message to DB
     now = datetime.now(timezone.utc)
@@ -161,8 +161,13 @@ async def message_send(sid, data):
     # Populate sender
     sender_doc = await db.users.find_one(
         {"_id": user_id},
-        {"username": 1, "displayName": 1, "avatarUrl": 1},
+        {"username": 1, "displayName": 1, "avatarUrl": 1, "userType": 1},
     )
+    if sender_doc:
+        from app.auth import get_pg_profile_pic
+        pg_pic = get_pg_profile_pic(sender_doc.get("username", ""), sender_doc.get("userType", "Influencer"))
+        if pg_pic:
+            sender_doc["avatarUrl"] = pg_pic
 
     message_response = {
         "_id": str(msg_doc["_id"]),

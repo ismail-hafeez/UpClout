@@ -39,12 +39,16 @@ def _serialize_message(msg: dict) -> dict:
 
 
 async def _populate_user(db, user_id, fields=None):
-    """Fetch a user by ID and return selected fields."""
+    """Fetch a user by ID and return selected fields, with PG profile pic."""
     if fields is None:
-        fields = {"username": 1, "displayName": 1, "avatarUrl": 1}
+        fields = {"username": 1, "displayName": 1, "avatarUrl": 1, "userType": 1}
     user = await db.users.find_one({"_id": ObjectId(user_id) if isinstance(user_id, str) else user_id}, fields)
     if user:
+        from app.auth import get_pg_profile_pic
+        pg_pic = get_pg_profile_pic(user.get("username", ""), user.get("userType", "Influencer"))
         user["_id"] = str(user["_id"])
+        if pg_pic:
+            user["avatarUrl"] = pg_pic
     return user
 
 
@@ -79,12 +83,21 @@ async def list_conversations(user: dict = Depends(get_current_user)):
         unread_counts = conv.get("unreadCounts", {})
         unread = unread_counts.get(str(user_id), 0)
 
+        # Fetch campaign title if exists
+        campaign_title = ""
+        if conv.get("campaignId"):
+            campaign = await db.campaigns.find_one({"_id": conv["campaignId"]})
+            if campaign:
+                campaign_title = campaign.get("title", "")
+
         result.append({
             "id": str(conv["_id"]),
             "otherUser": other_user,
             "lastMessage": last_msg_text,
             "lastMessageAt": conv.get("lastMessageAt"),
             "unread": unread,
+            "campaignId": str(conv["campaignId"]) if conv.get("campaignId") else None,
+            "campaignTitle": campaign_title,
         })
 
     return result
@@ -107,16 +120,16 @@ async def create_conversation(body: dict, user: dict = Depends(get_current_user)
     if not recipient:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Check connection
-    conn = await db.connections.find_one({
-        "$or": [
-            {"requester": user["_id"], "recipient": recipient_oid},
-            {"requester": recipient_oid, "recipient": user["_id"]},
-        ],
-        "status": "accepted",
-    })
-    if not conn:
-        raise HTTPException(status_code=403, detail="You must be connected to start a conversation")
+    # Connection check removed (unrestricted messaging enabled)
+    # conn = await db.connections.find_one({
+    #     "$or": [
+    #         {"requester": user["_id"], "recipient": recipient_oid},
+    #         {"requester": recipient_oid, "recipient": user["_id"]},
+    #     ],
+    #     "status": "accepted",
+    # })
+    # if not conn:
+    #     raise HTTPException(status_code=403, detail="You must be connected to start a conversation")
 
     # Check if conversation already exists
     conversation = await db.conversations.find_one({
@@ -144,12 +157,21 @@ async def create_conversation(body: dict, user: dict = Depends(get_current_user)
         if p:
             populated_participants.append(p)
 
+    # Fetch campaign title if exists
+    campaign_title = ""
+    if conversation.get("campaignId"):
+        campaign = await db.campaigns.find_one({"_id": conversation["campaignId"]})
+        if campaign:
+            campaign_title = campaign.get("title", "")
+
     conv_response = {
         "_id": str(conversation["_id"]),
         "participants": populated_participants,
         "lastMessage": str(conversation.get("lastMessage")) if conversation.get("lastMessage") else None,
         "lastMessageAt": conversation.get("lastMessageAt"),
         "unreadCounts": conversation.get("unreadCounts", {}),
+        "campaignId": str(conversation["campaignId"]) if conversation.get("campaignId") else None,
+        "campaignTitle": campaign_title,
         "createdAt": conversation.get("createdAt"),
         "updatedAt": conversation.get("updatedAt"),
     }
@@ -216,23 +238,17 @@ async def upload_file(
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
-    # Check connection
-    other_id = None
-    for p in conversation.get("participants", []):
-        if p != user_id:
-            other_id = p
-            break
-
-    if other_id:
-        conn = await db.connections.find_one({
-            "$or": [
-                {"requester": user_id, "recipient": other_id},
-                {"requester": other_id, "recipient": user_id},
-            ],
-            "status": "accepted",
-        })
-        if not conn:
-            raise HTTPException(status_code=403, detail="You must be connected to send files")
+    # Connection check removed (unrestricted messaging enabled)
+    # if other_id:
+    #     conn = await db.connections.find_one({
+    #         "$or": [
+    #             {"requester": user_id, "recipient": other_id},
+    #             {"requester": other_id, "recipient": user_id},
+    #         ],
+    #         "status": "accepted",
+    #     })
+    #     if not conn:
+    #         raise HTTPException(status_code=403, detail="You must be connected to send files")
 
     # Save file
     contents = await file.read()

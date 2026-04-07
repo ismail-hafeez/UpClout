@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.auth import get_current_user
+from app.database import get_db
 from app.chatbot import llm
 import psycopg2
 from typing import Optional
@@ -83,7 +84,32 @@ async def get_profile_details(username: str, user: dict = Depends(get_current_us
         cur.close()
         conn.close()
         
-        # 5. Generate AI Summary (Owly)
+        # 5. Check/Create MongoDB Shadow User for Messaging
+        db = get_db()
+        user_doc = await db.users.find_one({"username": uname})
+        if not user_doc:
+            # Create shadow user if they don't exist in MongoDB yet
+            from datetime import datetime, timezone
+            now = datetime.now(timezone.utc)
+            new_user = {
+                "username": uname,
+                "email": f"{uname}@placeholder.upclout.com",
+                "password": "shadow_user_no_password",
+                "displayName": name,
+                "avatarUrl": pic or "",
+                "userType": user_type,
+                "cloutScore": 0,
+                "reviewCount": 0,
+                "is_shadow": True,
+                "createdAt": now,
+                "updatedAt": now
+            }
+            res = await db.users.insert_one(new_user)
+            mongo_id = str(res.inserted_id)
+        else:
+            mongo_id = str(user_doc["_id"])
+
+        # 6. Generate AI Summary (Owly)
         summary_prompt = f"""
         Summarize this Instagram {user_type} in 2-3 concise sentences for a brand looking to collaborate.
         Name: {name} (@{uname})
@@ -101,6 +127,7 @@ async def get_profile_details(username: str, user: dict = Depends(get_current_us
             summary = f"{name} is a {niche} {user_type.lower()} with a focus on {', '.join(hashtags[:2])}. They have a strong following of {followers:,}."
 
         return {
+            "mongo_id": mongo_id,
             "type": user_type,
             "name": name,
             "username": uname,

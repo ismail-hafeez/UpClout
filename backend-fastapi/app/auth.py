@@ -18,7 +18,26 @@ def verify_brand(username: str) -> bool:
     conn = psycopg2.connect(database="postgres", user="postgres", password=1040)
     cur = conn.cursor()
     cur.execute("SELECT * FROM brands WHERE username = %s", (username,))
-    return cur.fetchone() is not None
+    res = cur.fetchone() is not None
+    cur.close()
+    conn.close()
+    return res
+
+
+def get_pg_profile_pic(username: str, user_type: str = "Influencer") -> str:
+    table = "brands" if user_type == "Brand" else "influencers"
+    try:
+        conn = psycopg2.connect(database="postgres", user="postgres", password=1040)
+        cur = conn.cursor()
+        cur.execute(f"SELECT profile_pic FROM {table} WHERE username = %s LIMIT 1", (username,))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        if row and row[0]:
+            return row[0]
+    except Exception as e:
+        print(f"PG {table} profile_pic error:", e)
+    return ""
 
 
 def hash_password(password: str) -> str:
@@ -51,12 +70,15 @@ def decode_token(token: str) -> dict:
 
 def user_to_safe(user: dict) -> dict:
     """Convert a MongoDB user document to a safe response (no password)."""
+    # Fetch actual profile picture from PostgreSQL
+    pg_pic = get_pg_profile_pic(user.get("username", ""), user.get("userType", "Influencer"))
+    
     return {
         "id": str(user["_id"]),
         "username": user.get("username", ""),
         "email": user.get("email", ""),
         "displayName": user.get("displayName") or user.get("username", ""),
-        "avatarUrl": user.get("avatarUrl", ""),
+        "avatarUrl": pg_pic if pg_pic else user.get("avatarUrl", ""),
         "cloutScore": user.get("cloutScore", 0),
         "reviewCount": user.get("reviewCount", 0),
         "userType": user.get("userType", "Influencer"),

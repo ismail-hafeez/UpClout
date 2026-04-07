@@ -26,3 +26,4 @@ class CollaborationDeliverablesRequest(BaseModel):
 
 class CollaborationPaymentRequest(BaseModel):
     status: str
+    amount: Optional[float] = None

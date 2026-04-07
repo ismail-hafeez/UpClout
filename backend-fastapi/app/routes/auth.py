@@ -33,9 +33,20 @@ async def register(body: RegisterRequest):
     existing = await db.users.find_one(
         {"$or": [{"email": body.email.lower()}, {"username": body.username}]}
     )
+    
+    # Shadow User Claiming Logic
+    is_claiming_shadow = False
     if existing:
-        field = "Email" if existing.get("email") == body.email.lower() else "Username"
-        raise HTTPException(status_code=409, detail=f"{field} already in use")
+        # If it's a shadow user matching ONLY the username, we can claim it
+        if existing.get("username") == body.username and existing.get("is_shadow") == True:
+            # Check if the NEW email is already used by someone else (not a shadow)
+            email_exists = await db.users.find_one({"email": body.email.lower(), "username": {"$ne": body.username}})
+            if email_exists:
+                raise HTTPException(status_code=409, detail="Email already in use")
+            is_claiming_shadow = True
+        else:
+            field = "Email" if existing.get("email") == body.email.lower() else "Username"
+            raise HTTPException(status_code=409, detail=f"{field} already in use")
 
     now = datetime.now(timezone.utc)
     user_doc = {
@@ -43,21 +54,29 @@ async def register(body: RegisterRequest):
         "email": body.email.lower().strip(),
         "password": hash_password(body.password),
         "displayName": (body.displayName or "").strip(),
-        "avatarUrl": "",
         "instagramId": None,
         "instagramHandle": None,
         "instagramAccessToken": None,
         "cloutScore": 0,
         "reviewCount": 0,
         "userType": body.userType if body.userType in ("Influencer", "Brand") else "Influencer",
-        "createdAt": now,
+        "is_shadow": False, # Explicitly untag shadow
         "updatedAt": now,
     }
 
-    result = await db.users.insert_one(user_doc)
-    user_doc["_id"] = result.inserted_id
-    token = create_token(str(result.inserted_id))
+    if is_claiming_shadow:
+        # Update existing record
+        await db.users.update_one({"_id": existing["_id"]}, {"$set": user_doc})
+        user_doc["_id"] = existing["_id"]
+        user_doc["createdAt"] = existing.get("createdAt", now)
+    else:
+        # Create new record
+        user_doc["avatarUrl"] = ""
+        user_doc["createdAt"] = now
+        result = await db.users.insert_one(user_doc)
+        user_doc["_id"] = result.inserted_id
 
+    token = create_token(str(user_doc["_id"]))
     return {"token": token, "user": user_to_safe(user_doc)}
 
 
@@ -118,12 +137,19 @@ async def get_brand_stats(user: dict = Depends(get_current_user)):
     try:
         conn = psycopg2.connect(database="postgres", user="postgres", password=1040)
         cur = conn.cursor()
-        cur.execute(f"SELECT followers, following, postcount FROM {table} WHERE username = %s LIMIT 1", (user.get("username"),))
+        cur.execute(f"SELECT followers, following, postcount, profile_pic, businesscategoryname, location FROM {table} WHERE username = %s LIMIT 1", (user.get("username"),))
         row = cur.fetchone()
         cur.close()
         conn.close()
         if row:
-            return {"followers": row[0], "following": row[1], "posts": row[2]}
+            return {
+                "followers": row[0], 
+                "following": row[1], 
+                "posts": row[2], 
+                "profile_pic": row[3],
+                "niche": row[4],
+                "location": row[5]
+            }
     except Exception as e:
         print(f"PG {table} stats error:", e)
     return {}

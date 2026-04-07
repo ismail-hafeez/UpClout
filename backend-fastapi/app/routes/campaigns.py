@@ -8,6 +8,9 @@ from app.models.campaign import CampaignCreateRequest, CampaignStatusRequest
 router = APIRouter(prefix="/api/campaigns", tags=["campaigns"])
 
 
+import psycopg2
+from bson import ObjectId
+
 # POST /api/campaigns
 @router.post("", status_code=201)
 async def create_campaign(body: CampaignCreateRequest, user: dict = Depends(get_current_user)):
@@ -27,7 +30,60 @@ async def create_campaign(body: CampaignCreateRequest, user: dict = Depends(get_
         "updatedAt": now,
     }
     result = await db.campaigns.insert_one(doc)
-    doc["_id"] = str(result.inserted_id)
+    campaign_id = result.inserted_id
+    
+    # Auto-invite recommended influencers
+    try:
+        conn = psycopg2.connect(database="postgres", user="postgres", password=1040)
+        cur = conn.cursor()
+        
+        # Get recommended influencers for this brand
+        query = """
+        SELECT i.username
+        FROM brand_recommendations br
+        JOIN influencers i ON br.recommended_influencer_id = i.influencerid
+        WHERE br.brand_id = (SELECT brandid FROM brands WHERE username = %s LIMIT 1);
+        """
+        cur.execute(query, (user.get("username"),))
+        rec_rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        
+        if rec_rows:
+            rec_usernames = [row[0] for row in rec_rows]
+            
+            # Find these influencers in our MongoDB users collection
+            influencers = await db.users.find({
+                "username": {"$in": rec_usernames},
+                "userType": "Influencer"
+            }).to_list(length=100)
+            
+            # Create a collaboration invite for each registered influencer
+            collab_docs = []
+            for inf in influencers:
+                collab_docs.append({
+                    "campaignId": campaign_id,
+                    "influencerId": inf["_id"],
+                    "brandId": user["_id"],
+                    "deliverables": [], # Initial empty deliverables
+                    "paymentDetails": {
+                        "amount": 0, # Start at 0, negotiate later
+                        "currency": "PKR",
+                        "status": "Pending",
+                    },
+                    "status": "Invited",
+                    "isNew": True,
+                    "createdAt": now,
+                    "updatedAt": now,
+                })
+            
+            if collab_docs:
+                await db.collaborations.insert_many(collab_docs)
+                
+    except Exception as e:
+        print("Campaign creation auto-invite error:", e)
+
+    doc["_id"] = str(campaign_id)
     doc["brandId"] = str(doc["brandId"])
     return doc
 

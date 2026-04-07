@@ -48,10 +48,14 @@ async def _populate_collab(db, collab: dict) -> dict:
         bid = result["brandId"] if isinstance(result["brandId"], ObjectId) else ObjectId(result["brandId"])
         brand = await db.users.find_one(
             {"_id": bid},
-            {"username": 1, "displayName": 1, "avatarUrl": 1},
+            {"username": 1, "displayName": 1, "avatarUrl": 1, "userType": 1},
         )
         if brand:
+            from app.auth import get_pg_profile_pic
+            pg_pic = get_pg_profile_pic(brand.get("username", ""), brand.get("userType", "Brand"))
             brand["_id"] = str(brand["_id"])
+            if pg_pic:
+                brand["avatarUrl"] = pg_pic
             result["brandId"] = brand
         else:
             result["brandId"] = str(result["brandId"])
@@ -61,10 +65,14 @@ async def _populate_collab(db, collab: dict) -> dict:
         iid = result["influencerId"] if isinstance(result["influencerId"], ObjectId) else ObjectId(result["influencerId"])
         influencer = await db.users.find_one(
             {"_id": iid},
-            {"username": 1, "displayName": 1, "avatarUrl": 1},
+            {"username": 1, "displayName": 1, "avatarUrl": 1, "userType": 1},
         )
         if influencer:
+            from app.auth import get_pg_profile_pic
+            pg_pic = get_pg_profile_pic(influencer.get("username", ""), influencer.get("userType", "Influencer"))
             influencer["_id"] = str(influencer["_id"])
+            if pg_pic:
+                influencer["avatarUrl"] = pg_pic
             result["influencerId"] = influencer
         else:
             result["influencerId"] = str(result["influencerId"])
@@ -77,7 +85,58 @@ async def _populate_collab(db, collab: dict) -> dict:
 async def create_collaboration(body: CollaborationCreateRequest, user: dict = Depends(get_current_user)):
     db = get_db()
     campaign_oid = ObjectId(body.campaignId)
-    influencer_oid = ObjectId(body.influencerId)
+    
+    # Handle influencer ID which might be from PG database (not registered)
+    influencer_id_str = str(body.influencerId)
+    if influencer_id_str.startswith("pg_inf_"):
+        # This user was found in PG but might not be in MongoDB yet
+        # We search them by username if we can find it
+        # Actually, let's just use the ID as provided from the frontend
+        # The frontend search for pg_inf_ results includes username.
+        # Since the backend create_collaboration only gets influencerId, we might need a workaround.
+        
+        # IMPROVEMENT: Re-fetch the user details from PG if this is a PG ID
+        import psycopg2
+        pg_id = influencer_id_str.replace("pg_inf_", "")
+        conn = psycopg2.connect(database="postgres", user="postgres", password=1040)
+        cur = conn.cursor()
+        cur.execute("SELECT username, name, profile_pic FROM influencers WHERE influencerid = %s", (pg_id,))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        
+        if not row:
+            raise HTTPException(status_code=404, detail="PG Influencer not found")
+            
+        username = row[0]
+        display_name = row[1] or row[0]
+        avatar_url = row[2] or ""
+        
+        # Check if already in MongoDB
+        user_doc = await db.users.find_one({"username": username})
+        if not user_doc:
+            # Create a "placeholder" or shadow user in MongoDB
+            now = datetime.now(timezone.utc)
+            user_doc = {
+                "username": username,
+                "email": f"{username}@placeholder.upclout.com", # placeholder email
+                "password": "shadow_user_no_password",
+                "displayName": display_name,
+                "avatarUrl": avatar_url,
+                "userType": "Influencer",
+                "cloutScore": 0,
+                "reviewCount": 0,
+                "is_shadow": True, # Mark as shadow user
+                "createdAt": now,
+                "updatedAt": now
+            }
+            res = await db.users.insert_one(user_doc)
+            user_doc["_id"] = res.inserted_id
+            
+        influencer_oid = user_doc["_id"]
+    else:
+        # Standard MongoDB ObjectId
+        influencer_oid = ObjectId(body.influencerId)
 
     existing = await db.collaborations.find_one({
         "campaignId": campaign_oid,
@@ -100,7 +159,7 @@ async def create_collaboration(body: CollaborationCreateRequest, user: dict = De
             "currency": body.currency or "USD",
             "status": "Pending",
         },
-        "status": "Negotiating",
+        "status": "Invited",
         "isNew": True,
         "createdAt": now,
         "updatedAt": now,
@@ -175,12 +234,75 @@ async def update_status(
     if not collab:
         raise HTTPException(status_code=404, detail="Not found")
 
+    # If an influencer accepts an 'Invited' collaboration, move it to 'Negotiating'
+    new_status = body.status
+    if collab.get("status") == "Invited" and body.status == "Content Creation":
+        # The user wanted Accepting to move to "Negotiating phase"
+        new_status = "Negotiating"
+
     await db.collaborations.update_one(
         {"_id": ObjectId(collab_id)},
-        {"$set": {"status": body.status, "updatedAt": datetime.now(timezone.utc)}},
+        {"$set": {"status": new_status, "updatedAt": datetime.now(timezone.utc)}},
     )
+    
+    # NEW: Automatically create conversation on acceptance
+    if new_status == "Negotiating":
+        try:
+            # Get campaign and brand info
+            brand_id = collab.get("brandId")
+            influencer_id = collab.get("influencerId")
+            campaign_id = collab.get("campaignId")
+            
+            # Check if conversation already exists
+            existing_conv = await db.conversations.find_one({
+                "participants": {"$all": [brand_id, influencer_id], "$size": 2}
+            })
+            
+            if not existing_conv:
+                now = datetime.now(timezone.utc)
+                conv_doc = {
+                    "participants": [brand_id, influencer_id],
+                    "lastMessage": None,
+                    "lastMessageAt": now,
+                    "unreadCounts": {},
+                    "campaignId": campaign_id, # Link to campaign
+                    "createdAt": now,
+                    "updatedAt": now,
+                }
+                await db.conversations.insert_one(conv_doc)
+            else:
+                # Update existing conversation with campaign context if not set
+                if not existing_conv.get("campaignId"):
+                    await db.conversations.update_one(
+                        {"_id": existing_conv["_id"]},
+                        {"$set": {"campaignId": campaign_id}}
+                    )
+        except Exception as e:
+            print("Auto-chat creation error:", e)
+
     updated = await db.collaborations.find_one({"_id": ObjectId(collab_id)})
     return _serialize_collab(updated)
+
+
+# DELETE /api/collaborations/{collab_id}/reject
+@router.delete("/{collab_id}/reject")
+async def reject_collaboration(
+    collab_id: str,
+    user: dict = Depends(get_current_user),
+):
+    db = get_db()
+    collab = await db.collaborations.find_one({
+        "_id": ObjectId(collab_id),
+        "influencerId": user["_id"]
+    })
+    if not collab:
+        raise HTTPException(status_code=404, detail="Collaboration not found or unauthorized")
+
+    await db.collaborations.update_one(
+        {"_id": ObjectId(collab_id)},
+        {"$set": {"status": "Declined", "updatedAt": datetime.now(timezone.utc)}}
+    )
+    return {"success": True, "message": "Collaboration invitation declined"}
 
 
 # PUT /api/collaborations/{collab_id}/deliverables
@@ -216,9 +338,71 @@ async def update_payment(
     if not collab:
         raise HTTPException(status_code=404, detail="Not found")
 
+    update_doc = {"paymentDetails.status": body.status, "updatedAt": datetime.now(timezone.utc)}
+    if body.amount is not None:
+        update_doc["paymentDetails.amount"] = body.amount
+
     await db.collaborations.update_one(
         {"_id": ObjectId(collab_id)},
-        {"$set": {"paymentDetails.status": body.status, "updatedAt": datetime.now(timezone.utc)}},
+        {"$set": update_doc},
     )
     updated = await db.collaborations.find_one({"_id": ObjectId(collab_id)})
     return _serialize_collab(updated)
+
+# POST /api/collaborations/{collab_id}/review
+@router.post("/{collab_id}/review")
+async def submit_review(
+    collab_id: str,
+    rating: int, # 1-5
+    comment: str,
+    user: dict = Depends(get_current_user)
+):
+    db = get_db()
+    collab = await db.collaborations.find_one({"_id": ObjectId(collab_id)})
+    if not collab:
+        raise HTTPException(status_code=404, detail="Collab not found")
+    
+    if collab.status != "Completed":
+        raise HTTPException(status_code=400, detail="Cannot review an incomplete collaboration")
+
+    is_brand = user["userType"] == "Brand"
+    reviewer_id = ObjectId(user["_id"])
+    
+    # Determine target of review
+    if is_brand:
+        target_id = ObjectId(collab["influencerId"])
+    else:
+        target_id = ObjectId(collab["brandId"])
+
+    # Check if review already exists for this side
+    existing = await db.reviews.find_one({"collabId": ObjectId(collab_id), "reviewerId": reviewer_id})
+    if existing:
+        raise HTTPException(status_code=400, detail="You have already reviewed this collaboration")
+
+    review_doc = {
+        "collabId": ObjectId(collab_id),
+        "reviewerId": reviewer_id,
+        "reviewerName": user.get("displayName") or user.get("username"),
+        "reviewerAvatar": user.get("avatarUrl"),
+        "targetId": target_id,
+        "rating": min(5, max(1, rating)),
+        "comment": comment,
+        "createdAt": datetime.now(timezone.utc)
+    }
+
+    await db.reviews.insert_one(review_doc)
+
+    # Update target user average rating (simplistic logic)
+    target_user = await db.users.find_one({"_id": target_id})
+    if target_user:
+        current_rating = target_user.get("cloutScore") or 0
+        current_count = target_user.get("reviewCount") or 0
+        new_count = current_count + 1
+        new_rating = ((current_rating * current_count) + rating) / new_count
+        
+        await db.users.update_one(
+            {"_id": target_id},
+            {"$set": {"cloutScore": round(new_rating, 1), "reviewCount": new_count}}
+        )
+
+    return {"success": True, "rating": rating}
