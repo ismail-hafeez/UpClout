@@ -4,7 +4,18 @@ data/
 __pycache__
 temp_data
 logs
+
+# Chatbot
 src/chatbot/chroma_db
 src/chatbot/processed_influencer_ids.txt
 src/chatbot/processed_brand_ids.txt
-chroma_db
+src/chatbot/chroma_db_groq
+
+# SRC
+src/similarity_matches.json
+
+# Frontend
+frontend/node_modules
+frontend/package-lock.json
+
+chroma_db_groq
