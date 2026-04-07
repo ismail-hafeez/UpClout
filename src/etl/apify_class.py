@@ -5,7 +5,7 @@ import requests
 import pandas as pd
 from datetime import datetime
 import log
-
+import boto3
 """
 Defines scrapers to extract data
 """
@@ -49,7 +49,7 @@ class Apify:
             log_message = f"Failed to download image. Status code:{response.status_code}"
 
         log.log_extract_meta_data(log_message)
-    
+  
     def save_to_csv(self, PATH: str, data: list) -> pd.DataFrame:
         # Convert to pandas DataFrame
         df = pd.DataFrame(data)

@@ -78,10 +78,6 @@ def ETL():
             print("Sleeping for 5 seconds ... ")  
             time.sleep(5)
 
-        if count == 10:
-            print("Taking long break ... ")  
-            time.sleep(60)
-
         print(f"{idx}: {influencer}")
 
         # Extract
@@ -99,12 +95,12 @@ def ETL():
         influencerID = meta_data.clean_meta_data(path) # Transform I
         postgres.load_influencer_table(path) # Load
         post_data.clean_post_data(path, influencerID) # Transform II + Load
-
+        
         # dump in txt file
         keep_track_influencers(influencer)  
 
-        # break
-
+        break
+ 
     postgres.close_connection()
 
 if __name__=="__main__":

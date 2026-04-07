@@ -17,17 +17,17 @@ def delete_folder(path: str) -> None:
 
 def get_brand_list() -> list[str]:
 
-    with open("../brand_profiles.txt", "r") as file:
+    with open("../../brand_profiles.txt", "r") as file:
         brands = [line.strip() for line in file.readlines()]
 
     return brands
 
 def already_processed(username: str) -> bool:
-    with open("../processed_brands.txt", "r") as f:
+    with open("../../processed_brands.txt", "r") as f:
         return username in {line.strip() for line in f}
 
 def keep_track_brands(brand: str) -> None:
-    with open("../processed_brands.txt", "a") as f:
+    with open("../../processed_brands.txt", "a") as f:
         f.write(f"{brand}\n")
 
 def get_post_data_dict(path: str) -> dict:
@@ -42,7 +42,7 @@ def get_post_data_dict(path: str) -> dict:
     return data[0]
 
 def isPrivate(response: any, username: str) -> bool:   
-    path: str = f"../data/{username}"
+    path: str = f"../../data/{username}"
          
     if response == 0:
         delete_folder(path)
@@ -74,7 +74,7 @@ def ETL():
         # Switch APIs every 5 scrapes
         if count % 4 == 0:
             print("Rotating APIs")
-            apify.rotate_apis(count)
+            apify.rotate_apis()
             print("Sleeping for 5 seconds ... ")  
             time.sleep(5)
 
@@ -86,6 +86,7 @@ def ETL():
         # Extract
         try:
             path = extract.scrape_brand(brand, apify) # Extract
+            count+=1
         except Exception as e:
             log.log_skipped_brand(f"{brand}Extract failed — {e}")
             continue
@@ -100,8 +101,10 @@ def ETL():
 
         # dump in txt file
         keep_track_brands(brand)  
-        count+=1
-   
+        
+        if count == 20:
+            break
+
     postgres.close_connection()
 
 if __name__=="__main__":

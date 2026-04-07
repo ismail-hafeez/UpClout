@@ -3,6 +3,9 @@ import os
 import pandas as pd
 import log
 
+BUCKET = os.getenv('AWS_S3_BUCKET')
+REGION = os.getenv('AWS_REGION')
+
 class Postgres:
     def __init__(self):
         self.conn = psycopg2.connect(database="postgres", user="postgres", password=1040)
