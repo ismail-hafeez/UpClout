@@ -1,8 +1,8 @@
 import React from 'react';
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  PieChart, Pie, Cell, 
-  AreaChart, Area, 
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell,
+  AreaChart, Area,
   Legend
 } from 'recharts';
 import { getAvatarUrl } from '../services/api';
@@ -43,16 +43,16 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({ data }) => {
             <BarChart data={data.hashtags} layout="vertical" margin={{ left: 10 }}>
               <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="rgba(255,255,255,0.1)" />
               <XAxis type="number" hide />
-              <YAxis 
-                dataKey="name" 
-                type="category" 
-                stroke="var(--clr-text-muted)" 
-                fontSize={11} 
-                tickLine={false} 
+              <YAxis
+                dataKey="name"
+                type="category"
+                stroke="var(--clr-text-muted)"
+                fontSize={11}
+                tickLine={false}
                 axisLine={false}
                 width={80}
               />
-              <Tooltip 
+              <Tooltip
                 cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                 contentStyle={{ background: 'var(--clr-surface)', border: '1px solid var(--clr-border)', borderRadius: '8px' }}
               />
@@ -87,7 +87,7 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({ data }) => {
 
       {/* 3. PRIME TIME */}
       <div className="analytics-card glass">
-        <h3>Prime Time ⏰</h3>
+        <h3>Prime Time</h3>
         <p className="card-desc">Average engagement by hour of day.</p>
         <div className="chart-container">
           <ResponsiveContainer width="100%" height={220}>
@@ -96,7 +96,7 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({ data }) => {
               <XAxis dataKey="hour" stroke="var(--clr-text-muted)" fontSize={10} tickFormatter={(h) => `${h}h`} />
               <YAxis hide />
               <Tooltip contentStyle={{ background: 'var(--clr-surface)', border: '1px solid var(--clr-border)', borderRadius: '8px' }} />
-              <Bar dataKey="engagement" fill="url(#colorEng)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="engagement" fill="#6366f1" radius={[2, 2, 0, 0]} barSize={20} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -123,10 +123,10 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({ data }) => {
           {data.mentions.map((m, i) => (
             <div key={i} className="collaborator-item">
               <div className="collab-avatar-wrapper">
-                <img 
-                  src={getAvatarUrl(m.pic) || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.name}`} 
-                  alt={m.name} 
-                  className="collab-avatar" 
+                <img
+                  src={getAvatarUrl(m.pic) || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.name}`}
+                  alt={m.name}
+                  className="collab-avatar"
                 />
                 <span className="collab-count">{m.value}</span>
               </div>
@@ -168,7 +168,7 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({ data }) => {
             <h3>Engagement Trends</h3>
             <p className="card-desc">Timeline of average interaction per post.</p>
           </div>
-          <div className="benchmark-badge" style={{ 
+          <div className="benchmark-badge" style={{
             background: data.benchmark?.status === 'Above Average' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(59, 130, 246, 0.1)',
             color: data.benchmark?.status === 'Above Average' ? '#22c55e' : '#3b82f6',
             padding: '0.4rem 0.8rem',
@@ -185,8 +185,8 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({ data }) => {
             <AreaChart data={data.trends}>
               <defs>
                 <linearGradient id="colorEng" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4}/>
-                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4} />
+                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
