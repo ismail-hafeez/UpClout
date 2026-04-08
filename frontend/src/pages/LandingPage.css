@@ -606,6 +606,190 @@
   box-shadow: 0 0 6px rgba(245, 158, 11, 0.3);
 }
 
+/* ============= SECTION: HOW IT WORKS ============= */
+.lp-how {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+  gap: 4rem;
+}
+
+.lp-how-header {
+  text-align: center;
+  max-width: 600px;
+}
+
+.lp-how-tag {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--lp-blue);
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  margin-bottom: 1.2rem;
+  letter-spacing: 0.03em;
+}
+
+.lp-how-title {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 1rem;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .lp-how-title {
+    white-space: normal;
+  }
+}
+
+.lp-how-title-accent {
+  background: linear-gradient(135deg, var(--lp-purple), var(--lp-blue-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.lp-how-subtitle {
+  font-size: 1.05rem;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.lp-how-grid {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.lp-how-step {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.2rem;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+.lp-how-step:hover {
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 12px 48px rgba(37, 99, 235, 0.12);
+}
+
+.lp-how-number {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: rgba(37, 99, 235, 0.08);
+  font-family: 'Sora', sans-serif;
+}
+
+.lp-how-icon {
+  width: 56px;
+  height: 56px;
+  background: white;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lp-blue);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+.lp-how-step h3 {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.lp-how-step p {
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.lp-how-connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 3rem;
+  color: var(--lp-blue);
+}
+
+@media (max-width: 1024px) {
+  .lp-how-grid {
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+  }
+
+  .lp-how-connector {
+    transform: rotate(90deg);
+    padding-top: 0;
+  }
+  
+  .lp-how-step {
+    width: 100%;
+    max-width: 500px;
+  }
+}
+
+.lp-how-footer {
+  margin-top: 3rem;
+  display: flex;
+  justify-content: center;
+}
+
+.lp-how-security {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1.6rem;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 1);
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--lp-blue-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.lp-how-security svg {
+  color: var(--lp-blue);
+}
+
+.lp-how-security-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
 /* ============= SECTION: FEATURES / AI ============= */
 .lp-features {
   position: relative;

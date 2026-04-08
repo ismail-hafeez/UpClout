@@ -85,6 +85,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNow }) => {
         </div>
         <div className="lp-nav-links">
           <button className="lp-nav-link" onClick={() => scrollTo('owly')}>Owly</button>
+          <button className="lp-nav-link" onClick={() => scrollTo('how')}>How it Works</button>
           <button className="lp-nav-link" onClick={() => scrollTo('features')}>Features</button>
           <button className="lp-nav-try" onClick={onTryNow}>
             Get Started →
@@ -134,6 +135,90 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNow }) => {
           </div>
         </div>
 
+      </section>
+
+      {/* ===== HOW IT WORKS SECTION ===== */}
+      <section className="lp-how" id="how">
+        <div className="lp-how-header lp-reveal">
+          <span className="lp-how-tag">WORKFLOW</span>
+          <h2 className="lp-how-title">
+            How the <span className="lp-how-title-accent">Magic</span> Happens
+          </h2>
+          <p className="lp-how-subtitle">
+            A simple, secure, and data-driven path to meaningful collaborations.
+          </p>
+        </div>
+
+        <div className="lp-how-grid lp-reveal">
+          {/* Step 1 */}
+          <div className="lp-how-step">
+            <div className="lp-how-number">01</div>
+            <div className="lp-how-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+              </svg>
+            </div>
+            <h3>Connect</h3>
+            <p>Link your Instagram account to start your journey. We securely scrape your data and analyze it.</p>
+          </div>
+
+          <div className="lp-how-connector">
+            <svg width="40" height="20" viewBox="0 0 40 20" fill="none">
+              <path d="M0 10H40" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" opacity="0.4" />
+              <path d="M35 5L40 10L35 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.4" />
+            </svg>
+          </div>
+
+          {/* Step 2 */}
+          <div className="lp-how-step">
+            <div className="lp-how-number">02</div>
+            <div className="lp-how-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </div>
+            <h3>Analyze</h3>
+            <p>Our AI engine deep-dives into your engagement, reach, and audience authenticity to build a verified profile for you.</p>
+          </div>
+
+          <div className="lp-how-connector">
+            <svg width="40" height="20" viewBox="0 0 40 20" fill="none">
+              <path d="M0 10H40" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" opacity="0.4" />
+              <path d="M35 5L40 10L35 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.4" />
+            </svg>
+          </div>
+
+          {/* Step 3 */}
+          <div className="lp-how-step">
+            <div className="lp-how-number">03</div>
+            <div className="lp-how-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <h3>Match</h3>
+            <p>Owly suggests the perfect partners. Whether you're a brand or creator, find matches that share your vision.</p>
+          </div>
+
+          <div className="lp-how-connector">
+            <svg width="40" height="20" viewBox="0 0 40 20" fill="none">
+              <path d="M0 10H40" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" opacity="0.4" />
+              <path d="M35 5L40 10L35 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.4" />
+            </svg>
+          </div>
+
+          {/* Step 4 */}
+          <div className="lp-how-step">
+            <div className="lp-how-number">04</div>
+            <div className="lp-how-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            </div>
+            <h3>Collaborate</h3>
+            <p>Chat in real-time, manage deliverables, and track performance. Close deals and grow your clout together.</p>
+          </div>
+        </div>
       </section>
 
       {/* ===== OWLY SECTION ===== */}
