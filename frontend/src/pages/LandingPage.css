@@ -653,10 +653,22 @@
 }
 
 .lp-how-title-accent {
-  background: linear-gradient(135deg, var(--lp-purple), var(--lp-blue-dark));
+  display: inline-flex;
+  background: linear-gradient(120deg, #8b5cf6 0%, #ec4899 25%, #3b82f6 50%, #06b6d4 75%, #8b5cf6 100%);
+  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: magicTextFlow 4s linear infinite;
+  padding: 0 0.1rem;
+  font-weight: 800;
+  position: relative;
+  text-shadow: 0 0 25px rgba(139, 92, 246, 0.15);
+}
+
+@keyframes magicTextFlow {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 
 .lp-how-subtitle {
