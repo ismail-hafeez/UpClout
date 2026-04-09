@@ -1,5 +1,32 @@
 const BASE_URL = 'http://localhost:5000/api';
 
+// ── Showcase Wall: module-level cache (fetched once, reused instantly) ──────
+let _showcaseCache: any[] | null = null;
+let _showcaseFetchPromise: Promise<any[]> | null = null;
+
+export const apiGetShowcaseWall = (): Promise<any[]> => {
+  // Return instantly from cache if already loaded
+  if (_showcaseCache !== null) return Promise.resolve(_showcaseCache);
+
+  // Deduplicate in-flight requests (if called twice before first resolves)
+  if (_showcaseFetchPromise) return _showcaseFetchPromise;
+
+  _showcaseFetchPromise = fetch(`${BASE_URL}/profiles/showcase/wall`)
+    .then(res => (res.ok ? res.json() : []))
+    .then((data: any[]) => {
+      _showcaseCache = data;
+      // Pre-warm browser image cache in the background
+      data.forEach(p => { const img = new Image(); img.src = p.profile_pic; });
+      return data;
+    })
+    .catch(() => {
+      _showcaseFetchPromise = null; // Allow retry on error
+      return [];
+    });
+
+  return _showcaseFetchPromise;
+};
+
 // Token helpers
 export const getToken = (): string | null => localStorage.getItem('token');
 export const setToken = (token: string) => localStorage.setItem('token', token);
