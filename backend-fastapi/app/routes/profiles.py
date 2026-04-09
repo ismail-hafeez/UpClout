@@ -10,6 +10,55 @@ router = APIRouter(prefix="/api/profiles", tags=["profiles"])
 def get_db_connection():
     return psycopg2.connect(database="postgres", user="postgres", password=1040)
 
+
+@router.get("/showcase/wall")
+async def get_showcase_wall():
+    """Public endpoint — returns random profiles with profile pics for the login page social wall."""
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        # Fetch random influencers with profile pics
+        cur.execute("""
+            SELECT name, username, profile_pic, businesscategoryname, followers, 'Influencer' as user_type
+            FROM influencers
+            WHERE profile_pic IS NOT NULL AND profile_pic != '' AND name != 'NaN'
+            ORDER BY RANDOM()
+            LIMIT 70
+        """)
+        inf_rows = cur.fetchall()
+
+        # Fetch random brands with profile pics
+        cur.execute("""
+            SELECT name, username, profile_pic, businesscategoryname, followers, 'Brand' as user_type
+            FROM brands
+            WHERE profile_pic IS NOT NULL AND profile_pic != '' AND name != 'NaN'
+            ORDER BY RANDOM()
+            LIMIT 50
+        """)
+        brand_rows = cur.fetchall()
+
+        cur.close()
+        conn.close()
+
+        profiles = []
+        for row in inf_rows + brand_rows:
+            profiles.append({
+                "name": row[0] or row[1],
+                "username": row[1],
+                "profile_pic": row[2],
+                "niche": row[3] or "Creator",
+                "followers": row[4] or 0,
+                "user_type": row[5],
+            })
+
+        return profiles
+
+    except Exception as e:
+        print("Showcase wall error:", e)
+        return []
+
+
 @router.get("/{username}")
 async def get_profile_details(username: str, user: dict = Depends(get_current_user)):
     """Fetches comprehensive profile details, stats, highest liked post, and AI summary."""
