@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AnalyticsCharts from '../components/AnalyticsCharts';
+import OwlIcon from '../components/OwlIcon';
 import { apiGetProfileDetails, apiGetAnalytics, getAvatarUrl } from '../services/api';
 import './ProfilePage.css';
 
@@ -56,6 +57,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ username, onNavigate, onBack 
 
   return (
     <div className="profile-root">
+      {/* Background container */}
+      <div className="profile-bg-shapes"></div>
+
       {/* Header / Nav */}
       <div className="profile-nav">
         <button className="back-link" onClick={onBack}>
@@ -107,7 +111,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ username, onNavigate, onBack 
           {/* OWLY SUMMARY */}
           <section className="owly-summary-card glass">
             <div className="owly-summary-header">
-              <div className="owly-avatar-mini">🦉</div>
+              <div className="owly-avatar-mini">
+                <OwlIcon size={32} />
+              </div>
               <h3>Owly's Take</h3>
             </div>
             <p className="summary-text">{profile.summary}</p>
@@ -138,8 +144,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ username, onNavigate, onBack 
         </div>
 
         {/* ANALYTICS SECTION */}
-        <section className="profile-analytics-section">
-          <h2 className="section-title">Visual <span className="accent">Analytics</span></h2>
+        <section className="profile-analytics-section" style={{ padding: '2.5rem' }}>
+          <h2 className="section-title" style={{ marginTop: 0 }}>Visual <span className="accent">Analytics</span></h2>
           <AnalyticsCharts data={analytics} />
         </section>
 
