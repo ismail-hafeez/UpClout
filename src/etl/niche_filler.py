@@ -9,9 +9,10 @@ project_root = r"c:\Users\ismai\OneDrive\Desktop\UpClout"
 sys.path.append(os.path.join(project_root, "backend-fastapi"))
 
 from app.chatbot import llm
+from db_utils import get_connection
 
 def get_db():
-    return psycopg2.connect(database="postgres", user="postgres", password="1040")
+    return get_connection()
 
 def get_category_universe(cur):
     """Fetches the list of all valid categories currently in the DB."""

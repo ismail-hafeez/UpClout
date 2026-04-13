@@ -5,7 +5,7 @@ import shutil
 from datetime import datetime, timezone
 
 from load import Postgres
-import psycopg2
+from db_utils import get_connection
 
 from apify_class import Apify
 
@@ -79,7 +79,7 @@ def handle_taggedUsers(postID: int, taggedUsers: list, postgres: Postgres) -> No
         postgres.load_posts_taggedUsers(postID, id)
 
 def mention_exists(username: str) -> bool:
-    conn = psycopg2.connect(database="postgres", user="postgres", password=1040)
+    conn = get_connection()
     cur = conn.cursor()
 
     query = """
@@ -142,7 +142,7 @@ def handle_coauthors(postID: int, taggedUsers: list) -> None:
     ...
 
 def get_hashtagID(hashtags: list) -> list:
-    conn = psycopg2.connect(database="postgres", user="postgres", password=1040)
+    conn = get_connection()
     cur = conn.cursor()
 
     query = "SELECT hashtagID FROM Hashtags WHERE tag_name = ANY(%s);"
