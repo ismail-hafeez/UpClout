@@ -13,7 +13,8 @@ src/chatbot/chroma_db_groq
 
 # SRC
 src/similarity_matches.json
-src/recommender/boost_analysis.json
+
+recommender/boost_analysis.json
 
 # Frontend
 frontend/node_modules
