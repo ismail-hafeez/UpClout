@@ -425,7 +425,9 @@ const CampaignDetails: React.FC<CampaignDetailsProps> = ({ campaignId, onNavigat
             <>
               {sent.length > 0 && (
                 <div style={{ marginBottom: '3rem' }}>
-                  <h2 style={{ marginBottom: '1rem', borderLeft: '4px solid #f59e0b', paddingLeft: '1rem', color: 'var(--clr-text-primary)' }}>Invitations Sent ({sent.length})</h2>
+                  <h2 style={{ marginBottom: '1rem', borderLeft: '4px solid #f59e0b', paddingLeft: '1rem', color: 'var(--clr-text-primary)' }}>
+                    {isBrand ? 'Invitations Sent' : 'Invitations Received'} ({sent.length})
+                  </h2>
                   <div className="cd-collab-list">
                     {sent.map(collab => renderCollabCard(collab))}
                   </div>

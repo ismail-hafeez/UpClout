@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 import { getAvatarUrl } from '../services/api';
 
-const COLORS = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe'];
+const COLORS = ['#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4', '#F59E0B'];
 
 interface AnalyticsChartsProps {
   data: {

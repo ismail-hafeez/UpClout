@@ -1,6 +1,9 @@
 # UpClout
 Our Final Year Project
 
+uvicorn app.main:app --port 5000 --reload
+npm start
+
 # S3 Bucket = upclout-profile-pics
 # IAM User = upclout-s3-uploader
 

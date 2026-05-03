@@ -3,7 +3,7 @@
 import os
 from typing import Dict, List
 
-import psycopg2
+from db_utils import get_connection
 
 DB_URL = os.getenv("DATABASE_URL")
 
@@ -15,13 +15,7 @@ class DBClient:
         pass
 
     def get_connection(self):
-        return psycopg2.connect(
-            database="postgres",
-            user="postgres",
-            password="1040",
-            host="localhost",
-            port="5432",
-        )
+        return get_connection()
 
     def fetch_influencers(self) -> List[Dict]:
         """Return list of influencer dicts with fields used by recommender."""

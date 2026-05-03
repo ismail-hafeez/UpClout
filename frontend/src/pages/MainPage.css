@@ -1,7 +1,7 @@
 .main-root {
   min-height: 100vh;
   /* Sync with Landing Page vibrant background */
-  background: linear-gradient(135deg, #6ba2dd 0%, #e4e6fb 40%, #f7dff1 80%, #c6d8f8 100%);
+  background: linear-gradient(135deg, #6ba2dd 0%, #e4e6fb 40%, #f7dff1 80%, #a9bfe6 100%);
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.4s ease;
@@ -1124,23 +1124,41 @@
 }
 
 .hero-stat-card {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
   border-radius: 20px;
   padding: 1.4rem 0.8rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .hero-stat-card,
+:root .hero-stat-card {
+  background: rgba(30, 41, 59, 0.45);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] .hero-stat-card {
+  background: rgba(255, 255, 255, 0.55);
 }
 
 .hero-stat-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-8px) scale(1.02);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.65);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .hero-stat-card:hover {
+  background: rgba(30, 41, 59, 0.65);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .stat-icon-wrapper {
@@ -1271,9 +1289,20 @@
 }
 
 @keyframes pulseMomentum {
-  0% { transform: scale(1); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3); }
-  50% { transform: scale(1.05); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5); }
-  100% { transform: scale(1); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3); }
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+  }
+
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+  }
 }
 
 .mom-icon {

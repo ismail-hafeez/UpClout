@@ -9,7 +9,7 @@ import UserChat from './pages/UserChat';
 import ProfilePage from './pages/ProfilePage';
 import CampaignDashboard from './pages/CampaignDashboard';
 import CampaignDetails from './pages/CampaignDetails';
-import { getToken, apiMe, setCurrentUser, clearToken, clearCurrentUser, apiGetConversations } from './services/api';
+import { getToken, apiMe, setCurrentUser, clearToken, clearCurrentUser, apiGetConversations, apiGetShowcaseWall } from './services/api';
 import { connectSocket, disconnectSocket, getSocket } from './services/socket';
 
 type AppPage = 'landing' | 'login' | 'main' | 'owly-intro' | 'owly-chat' | 'user-chat' | 'campaign-dashboard' | 'campaign-details' | 'profile';
@@ -20,6 +20,7 @@ const App: React.FC = () => {
   const [authChecked, setAuthChecked] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
   const [targetUsername, setTargetUsername] = useState<string | null>(null);
+  const [showcaseProfiles, setShowcaseProfiles] = useState<any[]>([]);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
   });
@@ -31,6 +32,13 @@ const App: React.FC = () => {
   }, [theme]);
 
   const handleToggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
+
+  // Pre-fetch showcase wall profiles on app load so the login page is instant
+  useEffect(() => {
+    apiGetShowcaseWall().then(data => {
+      if (data?.length) setShowcaseProfiles(data);
+    });
+  }, []);
 
   // Fetch conversations and compute total unread count
   const refreshUnread = async () => {
@@ -123,7 +131,7 @@ const App: React.FC = () => {
     case 'landing':
       return <LandingPage onTryNow={() => setPage('login')} />;
     case 'login':
-      return <LoginPage onLogin={handleLogin} />;
+      return <LoginPage onLogin={handleLogin} onBack={() => setPage('landing')} initialProfiles={showcaseProfiles} />;
     case 'owly-intro':
       return <OwlyIntro onContinue={() => setPage('owly-chat')} onBack={() => setPage('main')} />;
     case 'owly-chat':

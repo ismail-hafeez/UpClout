@@ -12,10 +12,29 @@
   color: var(--clr-text-primary);
   font-family: inherit;
 }
-.cd-back-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: transparent; border: 1px solid var(--clr-border); border-radius: 20px; padding: 0.5rem 1.25rem; color: var(--clr-text-muted); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 2rem; }
-.cd-back-btn .icon { font-size: 1.1rem; vertical-align: middle; }
-.cd-back-btn:hover { background: var(--clr-surface-2); border-color: var(--clr-primary); color: var(--clr-primary); transform: translateX(-4px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-.cd-back-btn:active { transform: translateX(-2px) scale(0.98); }
+.cd-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--clr-text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-bottom: 2rem;
+}
+
+.cd-back-btn:hover {
+  color: var(--clr-primary-light);
+  transform: translateX(-5px);
+}
+
+.cd-back-btn .icon {
+  font-size: 1.1rem;
+}
 .campaign-dash-header {
   display: flex;
   justify-content: space-between;
@@ -127,10 +146,10 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.5);
-  padding: 2.5rem;
+  padding: 1.5rem 2rem;
   border-radius: 28px;
   width: 90%;
-  max-width: 500px;
+  max-width: 450px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   animation: modalScaleUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -142,14 +161,14 @@
 
 .modal-content h2 {
   font-family: var(--font-display);
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 800;
   color: var(--clr-text-primary);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   text-align: center;
 }
 .form-group {
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.85rem;
 }
 .form-group label {
   display: block;
@@ -160,7 +179,7 @@
 }
 .form-group input {
   width: 100%;
-  padding: 0.85rem 1rem;
+  padding: 0.7rem 1rem;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.5);
@@ -179,7 +198,7 @@
   display: flex;
   justify-content: stretch;
   gap: 1rem;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
 }
 .modal-actions button {
   flex: 1;
@@ -190,13 +209,13 @@
   transition: all 0.2s ease;
 }
 .btn-secondary {
-  background: rgba(0, 0, 0, 0.04);
-  color: var(--clr-text-primary);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: #fee2e2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
   cursor: pointer;
 }
 .btn-secondary:hover {
-  background: rgba(0, 0, 0, 0.08);
+  background: #fecaca;
   transform: translateY(-2px);
 }
 .campaign-card-financials {

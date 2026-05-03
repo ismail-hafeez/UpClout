@@ -161,11 +161,7 @@ const OwlyChat: React.FC<OwlyChatProps> = ({ onBack }) => {
               <span className="message-time">{msg.timestamp}</span>
             </div>
 
-            {msg.sender === 'me' && msg.avatar && (
-              <div className="msg-avatar msg-avatar--me">
-                <img src={msg.avatar} alt="me" width="32" height="32" />
-              </div>
-            )}
+            {/* User avatar removed as requested */}
           </div>
         ))}
 

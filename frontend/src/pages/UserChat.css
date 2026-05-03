@@ -1,6 +1,6 @@
 .user-chat-root {
   min-height: 100vh;
-  background: linear-gradient(135deg, #6ba2dd 0%, #e4e6fb 40%, #f7dff1 80%, #c6d8f8 100%);
+  background: linear-gradient(135deg, #81a3c8 0%, #bbbee6 40%, #ebcae3 80%, #bbd3fa 100%);
   display: flex;
   animation: fadeIn 0.3s ease;
 }
@@ -201,14 +201,14 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
   margin: 0.8rem 0.8rem 0.8rem 0;
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   overflow: hidden;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
 }
 
 .chat-main-header {
@@ -216,8 +216,8 @@
   align-items: center;
   gap: 1rem;
   padding: 0.9rem 1.4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 
@@ -325,12 +325,18 @@
 }
 
 .message-bubble--other {
-  background: var(--clr-surface-2);
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom-left-radius: 4px;
 }
 
 .message-bubble--me {
-  background: var(--clr-bubble-user);
+  background: rgba(37, 99, 235, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-bottom-right-radius: 4px;
 }
 
@@ -351,9 +357,11 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.9rem 1.2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1);
+  padding: 0.8rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 40px;
+  margin: 0.5rem 1rem 1rem;
 }
 
 .input-icon-btn {

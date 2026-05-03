@@ -6,10 +6,29 @@
 }
 
 .cd-dash { padding: 2rem; max-width: 1000px; margin: 0 auto; color: var(--clr-text-primary); font-family: inherit; }
-.cd-back-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: transparent; border: 1px solid var(--clr-border); border-radius: 20px; padding: 0.5rem 1.25rem; color: var(--clr-text-muted); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 2rem; }
-.cd-back-btn .icon { font-size: 1.1rem; vertical-align: middle; }
-.cd-back-btn:hover { background: var(--clr-surface-2); border-color: var(--clr-primary); color: var(--clr-primary); transform: translateX(-4px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-.cd-back-btn:active { transform: translateX(-2px) scale(0.98); }
+.cd-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--clr-text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-bottom: 2rem;
+}
+
+.cd-back-btn:hover {
+  color: var(--clr-primary-light);
+  transform: translateX(-5px);
+}
+
+.cd-back-btn .icon {
+  font-size: 1.1rem;
+}
 .cd-header {
   background: rgba(255, 255, 255, 0.45);
   backdrop-filter: blur(20px);

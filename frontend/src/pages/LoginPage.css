@@ -15,7 +15,7 @@ body.login-page-active {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: linear-gradient(135deg, #697d93 0%, #9ca0d1 40%, #cd9dc1 80%, #d1c0ea 100%);
+  background: linear-gradient(135deg, #81a3c8 0%, #bbbee6 40%, #ebcae3 80%, #bbd3fa 100%);
   color: #0f172a;
   font-family: var(--font-body);
 }
@@ -167,7 +167,8 @@ body.login-page-active {
   left: 1.5rem;
   background: none;
   border: none;
-  color: #2563eb; /* Match login button blue */
+  color: #2563eb;
+  /* Match login button blue */
   cursor: pointer;
   transition: all 0.2s ease;
   z-index: 10;

@@ -9,7 +9,7 @@ interface CampaignDashboardProps {
 
 const CampaignDashboard: React.FC<CampaignDashboardProps> = ({ onNavigate, onBack }) => {
   const [campaigns, setCampaigns] = useState<any[]>([]);
-  const [activeDashboardTab, setActiveDashboardTab] = useState<'active' | 'completed'>('active');
+  const [activeDashboardTab, setActiveDashboardTab] = useState<'active' | 'progress' | 'completed' | 'declined'>('active');
   const [showCreate, setShowCreate] = useState(false);
   const user = getCurrentUser();
 
@@ -35,6 +35,8 @@ const CampaignDashboard: React.FC<CampaignDashboardProps> = ({ onNavigate, onBac
         const collabs = await apiGetCollaborations();
         const formatted = collabs.map((c: any) => ({
           ...(c.campaignId || {}),
+          _id: c.campaignId?._id || c._id,
+          collabId: c._id,
           collabStatus: c.status,
           brandName: c.brandId?.displayName || c.brandId?.username || 'Sponsor',
           collabAmount: c.paymentDetails?.amount
@@ -76,22 +78,43 @@ const CampaignDashboard: React.FC<CampaignDashboardProps> = ({ onNavigate, onBac
             className={`campaign-tab-btn ${activeDashboardTab === 'active' ? 'active' : ''}`}
             onClick={() => setActiveDashboardTab('active')}
           >
-            Active
+            {user?.userType === 'Brand' ? 'Active' : 'Invitations'}
           </button>
+          {user?.userType !== 'Brand' && (
+            <button 
+              className={`campaign-tab-btn ${activeDashboardTab === 'progress' ? 'active' : ''}`}
+              onClick={() => setActiveDashboardTab('progress')}
+            >
+              In Progress
+            </button>
+          )}
           <button 
             className={`campaign-tab-btn ${activeDashboardTab === 'completed' ? 'active' : ''}`}
             onClick={() => setActiveDashboardTab('completed')}
           >
             Completed
           </button>
+          {user?.userType !== 'Brand' && (
+            <button 
+              className={`campaign-tab-btn ${activeDashboardTab === 'declined' ? 'active' : ''}`}
+              onClick={() => setActiveDashboardTab('declined')}
+            >
+              Declined
+            </button>
+          )}
         </div>
 
         <div className="campaign-list">
           {campaigns.filter(c => {
-            const isCompleted = (c.collabStatus || c.status) === 'Completed';
-            return activeDashboardTab === 'completed' ? isCompleted : !isCompleted;
+            const status = (c.collabStatus || c.status || 'Active');
+            if (activeDashboardTab === 'completed') return status === 'Completed';
+            if (activeDashboardTab === 'declined') return status === 'Declined';
+            if (activeDashboardTab === 'progress') return ['Content Creation', 'Content Review', 'Negotiating'].includes(status);
+            // 'active' tab
+            if (user?.userType === 'Brand') return status === 'Active';
+            return status === 'Invited';
           }).map(c => (
-            <div key={c._id} className="campaign-card" onClick={() => onNavigate('campaign-details', { campaignId: c._id })}>
+            <div key={c.collabId || c._id} className="campaign-card" onClick={() => onNavigate('campaign-details', { campaignId: c._id })}>
               <h3>{c.title}</h3>
               {user?.userType !== 'Brand' && c.brandName && (
                 <span style={{ fontSize: '0.8rem', color: 'var(--clr-primary)', fontWeight: 600, display: 'block', marginBottom: '0.5rem' }}>
@@ -132,8 +155,12 @@ const CampaignDashboard: React.FC<CampaignDashboardProps> = ({ onNavigate, onBac
             </div>
           ))}
           {campaigns.filter(c => {
-            const isCompleted = (c.collabStatus || c.status) === 'Completed';
-            return activeDashboardTab === 'completed' ? isCompleted : !isCompleted;
+            const status = (c.collabStatus || c.status || 'Active');
+            if (activeDashboardTab === 'completed') return status === 'Completed';
+            if (activeDashboardTab === 'declined') return status === 'Declined';
+            if (activeDashboardTab === 'progress') return ['Content Creation', 'Content Review', 'Negotiating'].includes(status);
+            if (user?.userType === 'Brand') return status === 'Active';
+            return status === 'Invited';
           }).length === 0 && (
             <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: 'var(--clr-text-muted)', marginTop: '2rem' }}>
               No {activeDashboardTab} {user?.userType === 'Brand' ? 'campaigns' : 'collaborations'} found.

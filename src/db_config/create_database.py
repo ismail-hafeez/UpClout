@@ -7,6 +7,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from src import log 
+from db_utils import get_connection
 
 # Load environment variables
 load_dotenv()
@@ -16,7 +17,7 @@ class CreateDataBase:
         #self.POSTGRES_API=os.getenv("POSTGRES_CONNECTION")
         #self.conn = psycopg2.connect(POSTGRES_API)
         #self.cur = conn.cursor()
-        self.conn = psycopg2.connect(database="postgres", user="postgres", password=1040)
+        self.conn = get_connection()
         self.cur = self.conn.cursor()
 
     def influencer_table(self) -> None:

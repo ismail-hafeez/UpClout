@@ -16,7 +16,7 @@ import os
 from datetime import datetime
 
 import pandas as pd
-import psycopg2
+from db_utils import get_connection
 
 
 # ============================================================================
@@ -24,16 +24,7 @@ import psycopg2
 # ============================================================================
 def get_db_connection():
     """Connect to PostgreSQL database"""
-    if os.getenv("DATABASE_URL"):
-        return psycopg2.connect(os.getenv("DATABASE_URL"))
-
-    return psycopg2.connect(
-        database="postgres",
-        user="postgres",
-        password="1040",
-        host="localhost",
-        port="5432",
-    )
+    return get_connection()
 
 # ============================================================================
 # DATA FETCHING FROM DB
