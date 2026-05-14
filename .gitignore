@@ -10,14 +10,21 @@ src/chatbot/chroma_db
 src/chatbot/processed_influencer_ids.txt
 src/chatbot/processed_brand_ids.txt
 src/chatbot/chroma_db_groq
+src/chatbot/ddl_backup.sql
 
 # SRC
 src/similarity_matches.json
 
 recommender/boost_analysis.json
 
+tmp/niche_dry_run_output.txt
+
+
 # Frontend
 frontend/node_modules
 frontend/package-lock.json
 
 chroma_db_groq
+
+processed_influencer_ids_groq.txt
+processed_brand_ids_groq.txt
