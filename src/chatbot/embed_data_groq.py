@@ -25,7 +25,7 @@ from src.etl.load import Postgres
 PROCESSED_LOG_PATH = "processed_ids_groq.txt"
 CHUNK_SIZE = 1000  
 CHUNK_OVERLAP = 100
-BATCH_SIZE = 50  
+BATCH_SIZE = 50      
 
 def load_processed_ids(log_path: str = PROCESSED_LOG_PATH) -> set:
     """Load previously processed influencer IDs to avoid duplicates."""
