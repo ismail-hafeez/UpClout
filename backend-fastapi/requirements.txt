@@ -11,7 +11,9 @@ aiofiles
 langchain-groq
 langchain-huggingface
 langchain-community
+langchain-chroma
 langchain-text-splitters
+langgraph
 chromadb
 sentence-transformers
 pypdf
