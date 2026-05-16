@@ -63,4 +63,4 @@ GROUP BY
     tu.username
 ORDER BY tag_frequency DESC;
 
-select profile_pic from brands where name like '%Dhil%';
+select * from posts where ownerid = 1349182865;
