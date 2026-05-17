@@ -160,3 +160,25 @@ export const apiUpdateCollaborationDeliverables = (id: string, deliverables: any
 export const apiUpdateCollaborationPayment = (id: string, status: string, amount?: number) => request(`/collaborations/${id}/payment`, { method: 'PUT', body: JSON.stringify({ status, amount }) });
 export const apiSubmitCollabReview = (collabId: string, rating: number, comment: string) => request(`/collaborations/${collabId}/review`, { method: 'POST', body: JSON.stringify({ rating, comment }) });
 export const apiUpdateCampaignStatus = (id: string, status: string) => request(`/campaigns/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) });
+
+// Owly Conversations
+export const apiGetOwlyConversations = () => request('/owly/conversations');
+export const apiGetOwlyMessages = (conversationId: string) => request(`/owly/conversations/${conversationId}/messages`);
+export const apiCreateOwlyConversation = () => request('/owly/conversations', { method: 'POST' });
+export const apiDeleteOwlyConversation = (conversationId: string) => request(`/owly/conversations/${conversationId}`, { method: 'DELETE' });
+
+// Owly Chat (streaming — needs custom fetch with auth)
+export const apiOwlyChat = async (message: string, conversationId: string | null) => {
+  const token = getToken();
+  return fetch(`${BASE_URL}/owly/chat`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({
+      message,
+      conversation_id: conversationId,
+    }),
+  });
+};
