@@ -3,16 +3,15 @@ import './styles/globals.css';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import MainPage from './pages/MainPage';
-import OwlyIntro from './pages/OwlyIntro';
 import OwlyChat from './pages/OwlyChat';
 import UserChat from './pages/UserChat';
 import ProfilePage from './pages/ProfilePage';
 import CampaignDashboard from './pages/CampaignDashboard';
 import CampaignDetails from './pages/CampaignDetails';
-import { getToken, apiMe, setCurrentUser, clearToken, clearCurrentUser, apiGetConversations, apiGetShowcaseWall } from './services/api';
+import { getToken, apiMe, setCurrentUser, clearToken, clearCurrentUser, apiGetConversations } from './services/api';
 import { connectSocket, disconnectSocket, getSocket } from './services/socket';
 
-type AppPage = 'landing' | 'login' | 'main' | 'owly-intro' | 'owly-chat' | 'user-chat' | 'campaign-dashboard' | 'campaign-details' | 'profile';
+type AppPage = 'landing' | 'login' | 'main' | 'owly-chat' | 'user-chat' | 'campaign-dashboard' | 'campaign-details' | 'profile';
 
 const App: React.FC = () => {
   const [page, setPage] = useState<AppPage>('landing');
@@ -20,7 +19,6 @@ const App: React.FC = () => {
   const [authChecked, setAuthChecked] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
   const [targetUsername, setTargetUsername] = useState<string | null>(null);
-  const [showcaseProfiles, setShowcaseProfiles] = useState<any[]>([]);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
   });
@@ -33,12 +31,6 @@ const App: React.FC = () => {
 
   const handleToggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
 
-  // Pre-fetch showcase wall profiles on app load so the login page is instant
-  useEffect(() => {
-    apiGetShowcaseWall().then(data => {
-      if (data?.length) setShowcaseProfiles(data);
-    });
-  }, []);
 
   // Fetch conversations and compute total unread count
   const refreshUnread = async () => {
@@ -108,7 +100,7 @@ const App: React.FC = () => {
   };
 
   const handleNavigate = (target: string, params?: any) => {
-    if (target === 'owly') setPage('owly-intro');
+    if (target === 'owly') setPage('owly-chat');
     else if (target === 'chats') {
       setTotalUnread(0); // reset badge when entering chats
       setPage('user-chat');
@@ -131,11 +123,9 @@ const App: React.FC = () => {
     case 'landing':
       return <LandingPage onTryNow={() => setPage('login')} />;
     case 'login':
-      return <LoginPage onLogin={handleLogin} onBack={() => setPage('landing')} initialProfiles={showcaseProfiles} />;
-    case 'owly-intro':
-      return <OwlyIntro onContinue={() => setPage('owly-chat')} onBack={() => setPage('main')} />;
+      return <LoginPage onLogin={handleLogin} onBack={() => setPage('landing')} />;
     case 'owly-chat':
-      return <OwlyChat onBack={() => setPage('owly-intro')} />;
+      return <OwlyChat onBack={() => setPage('main')} />;
     case 'user-chat':
       return <UserChat onBack={() => setPage('main')} />;
     case 'campaign-dashboard':
