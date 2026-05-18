@@ -627,8 +627,8 @@ const MainPage: React.FC<MainPageProps> = ({ onNavigate, onBack, unreadCount, th
                 </div>
                 <div className="reco-grid">
                   {risingStars.map(star => (
-                    <div 
-                      key={star.mongo_id} 
+                    <div
+                      key={star.mongo_id}
                       className="influencer-card rising-card"
                       onClick={() => onNavigate('profile', { username: star.username })}
                     >
