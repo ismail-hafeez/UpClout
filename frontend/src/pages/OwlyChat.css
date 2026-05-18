@@ -1,9 +1,153 @@
 .owly-chat-root {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: linear-gradient(135deg, #81a3c8 0%, #bbbee6 40%, #ebcae3 80%, #bbd3fa 100%);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   animation: fadeIn 0.3s ease;
+}
+
+/* ========= SIDEBAR ========= */
+.owly-sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(25px) saturate(1.4);
+  -webkit-backdrop-filter: blur(25px) saturate(1.4);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease, min-width 0.3s ease, opacity 0.3s ease;
+  overflow: hidden;
+}
+
+.owly-sidebar--closed {
+  width: 0;
+  min-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.owly-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.owly-sidebar-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--clr-text-primary);
+}
+
+.owly-new-chat-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--clr-primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.owly-new-chat-btn:hover {
+  background: rgba(37, 99, 235, 0.2);
+  transform: scale(1.05);
+}
+
+.owly-sidebar-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.owly-sidebar-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 2rem 1rem;
+  color: var(--clr-text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.owly-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-bottom: 2px;
+}
+
+.owly-sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.owly-sidebar-item--active {
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+}
+
+.owly-sidebar-item-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.owly-sidebar-item-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--clr-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.owly-sidebar-item-date {
+  font-size: 0.72rem;
+  color: var(--clr-text-muted);
+}
+
+.owly-sidebar-delete {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: none;
+  color: var(--clr-text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+
+.owly-sidebar-item:hover .owly-sidebar-delete {
+  opacity: 1;
+}
+
+.owly-sidebar-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* ========= MAIN CHAT AREA ========= */
+.owly-chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 /* HEADER */
@@ -16,9 +160,12 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+}
+
+.owly-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .back-btn {
@@ -36,6 +183,23 @@
 
 .back-btn:hover {
   background: rgba(37, 99, 235, 0.1);
+  color: var(--clr-primary-light);
+}
+
+.owly-sidebar-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-text-muted);
+  transition: background 0.2s, color 0.2s;
+}
+
+.owly-sidebar-toggle:hover {
+  background: rgba(37, 99, 235, 0.08);
   color: var(--clr-primary-light);
 }
 
@@ -74,7 +238,7 @@
   box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
 }
 
-/* MESSAGES  */
+/* MESSAGES */
 .owly-messages-area {
   flex: 1;
   padding: 1.5rem 2rem;
@@ -85,6 +249,29 @@
   max-width: 900px;
   margin: 0 auto;
   width: 100%;
+}
+
+.owly-loading-history {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 3rem 0;
+  color: var(--clr-text-muted);
+  font-size: 0.9rem;
+}
+
+.owly-loading-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(37, 99, 235, 0.15);
+  border-top-color: var(--clr-primary-light);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .message-row {
@@ -115,12 +302,6 @@
 
 .msg-avatar--owly {
   background: none;
-}
-
-.msg-avatar--me img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .message-bubble {
@@ -163,7 +344,7 @@
   align-self: flex-end;
 }
 
-/*  TYPING */
+/* TYPING */
 .typing-bubble {
   padding: 0.9rem 1.1rem;
   flex-direction: row;
@@ -181,7 +362,7 @@
   animation: typingDot 1.2s ease-in-out infinite;
 }
 
-/* INPUT BAR  */
+/* INPUT BAR */
 .owly-input-bar {
   display: flex;
   align-items: center;
@@ -195,28 +376,7 @@
   max-width: 850px;
   margin: 0 auto 1.5rem;
   width: calc(100% - 2.5rem);
-  position: sticky;
-  bottom: 1rem;
-  z-index: 10;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-}
-
-.input-icon-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--clr-text-muted);
-  flex-shrink: 0;
-  transition: color var(--transition-fast), background var(--transition-fast);
-}
-
-.input-icon-btn:hover {
-  color: var(--clr-primary-light);
-  background: rgba(37, 99, 235, 0.08);
 }
 
 .chat-input {
@@ -263,7 +423,21 @@
   transform: scale(1.08);
 }
 
-@media (max-width: 600px) {
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .owly-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .owly-sidebar--closed {
+    transform: translateX(-100%);
+  }
+
   .owly-messages-area {
     padding: 1rem;
   }
