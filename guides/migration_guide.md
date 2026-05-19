@@ -39,7 +39,7 @@ def get_connection():
 Open your root `.env` file and add this line:
 
 ```
-DATABASE_URL=postgresql://neondb_owner:npg_U3CTwHVBuen8@ep-royal-grass-a1sinoqj-pooler.ap-southeast-1.aws.neon.tech/upclout?sslmode=require
+DATABASE_URL=postgresql://<NEON_USER>:<NEON_PASSWORD>@<NEON_HOST>/upclout?sslmode=require
 ```
 
 > [!CAUTION]
@@ -235,7 +235,7 @@ Open `upclout_dump.sql` in a text editor. Verify:
 ### Step 4.3: Restore to Neon
 
 ```powershell
-psql "postgresql://neondb_owner:npg_U3CTwHVBuen8@ep-royal-grass-a1sinoqj-pooler.ap-southeast-1.aws.neon.tech/upclout?sslmode=require" < C:\Users\ismai\OneDrive\Desktop\upclout_dump.sql
+psql "postgresql://<NEON_USER>:<NEON_PASSWORD>@<NEON_HOST>/upclout?sslmode=require" < C:\Users\ismai\OneDrive\Desktop\upclout_dump.sql
 ```
 
 > [!WARNING]
@@ -244,7 +244,7 @@ psql "postgresql://neondb_owner:npg_U3CTwHVBuen8@ep-royal-grass-a1sinoqj-pooler.
 ### Step 4.4: Verify
 
 ```powershell
-psql "postgresql://neondb_owner:npg_U3CTwHVBuen8@ep-royal-grass-a1sinoqj-pooler.ap-southeast-1.aws.neon.tech/upclout?sslmode=require"
+psql "postgresql://<NEON_USER>:<NEON_PASSWORD>@<NEON_HOST>/upclout?sslmode=require"
 ```
 
 Then run:
