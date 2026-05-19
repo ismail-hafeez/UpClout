@@ -15,6 +15,7 @@ from app.routes.users import router as users_router
 from app.routes.campaigns import router as campaigns_router
 from app.routes.collaborations import router as collaborations_router
 from app.routes.owly import router as owly_router
+from app.routes.owly_conversations import router as owly_conv_router
 from app.routes.analytics import router as analytics_router
 from app.routes.profiles import router as profiles_router
 
@@ -53,6 +54,7 @@ app.include_router(users_router)
 app.include_router(campaigns_router)
 app.include_router(collaborations_router)
 app.include_router(owly_router)
+app.include_router(owly_conv_router)
 app.include_router(analytics_router)
 app.include_router(profiles_router)
 
